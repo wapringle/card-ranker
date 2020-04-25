@@ -1,0 +1,26 @@
+
+
+div.selected {
+    z-index: 1;
+    background-color: #e0f7fa; 
+}
+
+
+div.clicked {
+    z-index: 2;
+    background-color: #00bcd4; 
+}
+
+
+div.card {
+    z-index=1;
+    background-color: white; 
+    border: solid black;    
+}
+
+div.rank {
+    z-index=0;
+    background-color: white; 
+    border: solid black;    
+}
+
