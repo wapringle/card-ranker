@@ -7,6 +7,14 @@ var topmargin=100,
     rankwidth=width;
     rankheight=height;
     
+var deck=[
+    "Edinburgh",
+    "Rome",
+    "Tokyo",
+];
+
+
+
 var cardno=1;
 function Card(t) {
     this.txt= t;
@@ -21,22 +29,35 @@ Card.prototype.create=function(left,top) {
         c.id="C"+this.cardno;
         c.className='card';
         c.style="position:absolute; left: "+ left+ "px; top: "+top+"px; width: "+width+"px;  height: "+height+"px;";
+        
+        /*
+         * the card has a header which the mouse uses to drag the card, plus a body. 
+         * This bit will be expanded
+         */
 
         var header=document.createElement('DIV');
         header.style="background-color: gray; border-bottom: dotted black; padding: 3px; font-family: sans-serif; font-weight: bold;";
         header.innerText=this.txt;
         header.addEventListener('mousedown',function (e) { 
             event.target.parentNode.className="clicked";
-            event.target.parentNode.style.zIndex=3;
-            drag(c,e); 
+            event.target.parentNode.style.zIndex=3; // When card is dragged, it should pass over all other items
+            drag(c,e); // This is the David Flanagan function. [ a lot of the detail between browsers is now redundant ]
         },false);
+        
         c.appendChild(header);
         var body=document.createElement('DIV');
+        /* 
+         * Body is just a placeholder for card image etc.
+         */
+         
         body.innerHTML="<div style='font-size: xx-large; text-align: center'>"+this.txt+"</div>";
         c.appendChild(body);
         
         return c;
 }
+
+
+
 var rankno=1;
 function Rank(t) {
     this.txt= t;
@@ -70,11 +91,6 @@ var assignedSlots=[];
 var activeSlot=-1;
 function CreateCards() {
     var board = document.getElementById('board');
-    var deck=[
-        "Edinburgh",
-        "Rome",
-        "Tokyo",
-    ];
     
     for (var i=0;i<deck.length; i++) {
         board.appendChild(new Card(deck[i]).create(lhmargin,topmargin+(height+gap -170)*i) );
@@ -90,6 +106,9 @@ function CreateCards() {
 
 
 function mouseoverRank(x,y) {
+    /*
+     * What happens when mouse enters or leaves target landing pad
+     */
     if(activeSlot>=0)
         if(rankSlots[activeSlot].contains(x,y))
             return;
@@ -117,10 +136,24 @@ function moveCard(from,to) {
     with(rankSlots[to].div) {
         appendChild(assignedSlots[from]);
     }
+    delta_left=rankSlots[to].left - rankSlots[from].left;
+    delta_top=rankSlots[to].top - rankSlots[from].top;
+    frames=10;
     with(assignedSlots[to]) {
         style.left = "0px";
         style.top =  "0px";
+        
     }
+    /*
+     * This bit animates moving the cards between slots. Unecessary but cool. 
+     * Another Flanagan script
+     */
+    animateCSS(assignedSlots[to],frames,20,{ 
+        top:  function(frame,time) { return delta_top/frames*(frame - frames +1) +  "px"; },
+        left: function(frame,time) { return delta_left/frames*(frame - frames +1) + "px"; }
+    });
+    
+    
     
 }
 
@@ -132,7 +165,7 @@ function snapoverRank(elementToDrag,x,y) {
         /*
          * Card has landed over a destination slot. Snap it to slot.
          */
-        var as=activeSlot;
+        var as=activeSlot; /* activeSlot appears to be overridden when this is running */
         for(var i=0;i<assignedSlots.length;i++) {
             if(assignedSlots[i]==elementToDrag) {
                 /*
