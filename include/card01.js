@@ -75,14 +75,14 @@ function flipper(card,event) {
         dk.flipped= !dk.flipped;
         card.lastChild.innerHTML=get_body_text(dk);
         animateCSS(card,frameCount,50,{ 
-            width:  function(frame,time) { return delta_width*(frame+1) +  "px"; },
-            left:  function(frame,time) { lll=ll+delta_width/2*(frameCount - frame -1 );  return lll +  "px"; },
+            width:  function(frame,time) {return (width * Math.cos((frameCount - frame -1 )/frameCount * Math.PI / 2)).toFixed(0) +  "px"; },
+            left:  function(frame,time) { lll=(ll+width/2 - (width * Math.cos((frameCount - frame -1 )/frameCount * Math.PI / 2))/2).toFixed(0) ;  return lll +  "px"; },
         },flipper3);
     }
     
     animateCSS(card,frameCount,25,{ 
-        width:  function(frame,time) { return delta_width*(frameCount - frame -1 ) +  "px"; },
-        left:  function(frame,time) { lll=ll+delta_width/2*(frame+1);  return lll +  "px"; },
+        width:  function(frame,time) { return (width * Math.cos((frame+1)/frameCount * Math.PI / 2)).toFixed(0) +  "px"; },
+        left:  function(frame,time) { lll=(ll+width/2 - (width * Math.cos((frame+1)/frameCount * Math.PI / 2))/2).toFixed(0) ;  return lll +  "px"; },
     },flipper2);
 
 }
