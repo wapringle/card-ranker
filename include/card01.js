@@ -3,29 +3,95 @@ var topmargin=100,
     rhmargin=100,
     gap=30,
     width=250,
-    height=170;
+    height=166;
     rankwidth=width;
     rankheight=height;
     
 var deck=[
-    "Edinburgh",
-    "Rome",
-    "Tokyo",
+    { name: "Beijing, China", front: "beijing_front.jpg", back: "kampala_back.jpg"},
+    { name: "Delhi, India", front: "delhi_front.jpg", back: "kampala_back.jpg"},
+    { name: "Doha, Qatar ", front: "doha_front.jpg", back: "kampala_back.jpg"},
+    { name: "Istanbul, Turkey", front: "istanbul_front.jpg", back: "kampala_back.jpg"},
+    { name: "Kampala, Uganda", front: "kampala_front.jpg", back: "kampala_back.jpg"},
+    { name: "Leeds, England", front: "leeds_front.jpg", back: "kampala_back.jpg"},
+    { name: "Lima, Peru", front: "lima_front.jpg", back: "kampala_back.jpg"},
+    { name: "London, England", front: "london_front.jpg", back: "kampala_back.jpg"},
+    { name: "New York, USA", front: "new_york_front.jpg", back: "kampala_back.jpg"},
+    { name: "Paris, France", front: "paris_front.jpg", back: "kampala_back.jpg"},
+    { name: "Sydney, Australia", front: "sydney_front.jpg", back: "kampala_back.jpg"},
 ];
 
 
 
-var cardno=1;
-function Card(t) {
-    this.txt= t;
-    this.cardno=cardno;
-    cardno += 1;
+function Card(i) {
+    this.txt= deck[i].name;
+    this.cardno=i;
 }
 
+/*
+ * This lot is a mess
+ */
+ 
+function get_deck_for_card(c) {
+    for(i=0;i<deck.length;i++) {
+        if(deck[i].card==c)
+            return deck[i];
+    }
+    return null; // not found - shouldn't happen haha
+}
+
+function get_body_text(dk) {
+    /*
+     * We may want to replace the back image with some html text
+     */
+    body_height=height - 20; // a guess
+    jpg=dk.flipped? dk.back : dk.front;
+    return  "<div><img style='height: "+body_height+"px;' src='include/" + jpg +"'></div>";
+    /*
+    if(dk.flipped)
+        return "<DIV><h>A Message</h></div";
+    else
+        return  "<div><img style='height: "+body_height+"px;' src='include/" + jpg +"'></div>";
+    */
+
+}
+
+
+function flipper(card,event) {
+    /*
+     * flip card front to back or vice versa
+     */
+    frameCount=20;
+    delta_width=width / frameCount;
+    ll=card.offsetLeft;
+    var txt=card.firstChild.innerText;
+    card.firstChild.innerText="";
+    function flipper3(card) {
+        card.firstChild.innerText=txt;
+    }
+    function flipper2(card) {
+        /* This is called to show the reverse side */
+        dk=get_deck_for_card(card);
+        dk.flipped= !dk.flipped;
+        card.lastChild.innerHTML=get_body_text(dk);
+        animateCSS(card,frameCount,50,{ 
+            width:  function(frame,time) { return delta_width*(frame+1) +  "px"; },
+            left:  function(frame,time) { lll=ll+delta_width/2*(frameCount - frame -1 );  return lll +  "px"; },
+        },flipper3);
+    }
+    
+    animateCSS(card,frameCount,25,{ 
+        width:  function(frame,time) { return delta_width*(frameCount - frame -1 ) +  "px"; },
+        left:  function(frame,time) { lll=ll+delta_width/2*(frame+1);  return lll +  "px"; },
+    },flipper2);
+
+}
 
 Card.prototype.create=function(left,top) {
         var c=document.createElement('DIV');
         this.div=c;
+        deck[this.cardno].card=c;
+        this.flipped=false;
         c.id="C"+this.cardno;
         c.className='card';
         c.style="position:absolute; left: "+ left+ "px; top: "+top+"px; width: "+width+"px;  height: "+height+"px;";
@@ -36,7 +102,7 @@ Card.prototype.create=function(left,top) {
          */
 
         var header=document.createElement('DIV');
-        header.style="background-color: gray; border-bottom: dotted black; padding: 3px; font-family: sans-serif; font-weight: bold;";
+        header.style="background-color: gray; border-bottom: dotted black; padding: 3px; font-family: sans-serif; font-weight: bold; height: 20px";
         header.innerText=this.txt;
         header.addEventListener('mousedown',function (e) { 
             event.target.parentNode.className="clicked";
@@ -50,9 +116,15 @@ Card.prototype.create=function(left,top) {
          * Body is just a placeholder for card image etc.
          */
          
-        body.innerHTML="<div style='font-size: xx-large; text-align: center'>"+this.txt+"</div>";
+        body.innerHTML=get_body_text(deck[this.cardno]);
         c.appendChild(body);
-        
+        /*
+         * click over the body to flip the card ( will this get confused with dragging header ? )
+         */
+        body.addEventListener('mousedown',function (e) { 
+            flipper(c,e);
+        },false);
+
         return c;
 }
 
@@ -91,13 +163,15 @@ var assignedSlots=[];
 var activeSlot=-1;
 function CreateCards() {
     var board = document.getElementById('board');
-    
     for (var i=0;i<deck.length; i++) {
-        board.appendChild(new Card(deck[i]).create(lhmargin,topmargin+(height+gap -170)*i) );
+        board.appendChild(new Card(i).create(lhmargin,topmargin+(height+gap -170)*i) );
+        
     }
     for (var i=0;i<deck.length; i++) {
         var r=new Rank(""+(i+1));
-        board.appendChild(r.create(lhmargin+width+rhmargin,topmargin+(height+gap)*i));
+        row = i % 4;
+        col = (i - row)/4;
+        board.appendChild(r.create(lhmargin+(width+rhmargin)*(col+1),topmargin+(height+gap)*row));
         rankSlots[i]=r;
         assignedSlots[i]=null;
     }
@@ -138,7 +212,7 @@ function moveCard(from,to) {
     }
     delta_left=rankSlots[to].left - rankSlots[from].left;
     delta_top=rankSlots[to].top - rankSlots[from].top;
-    frames=10;
+    frameCount=10;
     with(assignedSlots[to]) {
         style.left = "0px";
         style.top =  "0px";
@@ -148,9 +222,9 @@ function moveCard(from,to) {
      * This bit animates moving the cards between slots. Unecessary but cool. 
      * Another Flanagan script
      */
-    animateCSS(assignedSlots[to],frames,20,{ 
-        top:  function(frame,time) { return delta_top/frames*(frame - frames +1) +  "px"; },
-        left: function(frame,time) { return delta_left/frames*(frame - frames +1) + "px"; }
+    animateCSS(assignedSlots[to],frameCount,20,{ 
+        top:  function(frame,time) { return delta_top/frameCount*(frame - frameCount +1) +  "px"; },
+        left: function(frame,time) { return delta_left/frameCount*(frame - frameCount +1) + "px"; }
     });
     
     
