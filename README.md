@@ -4,5 +4,7 @@ On release the card will either snap into a slot or back to it's original positi
 I have added a few highlights to show when a card is selected or over a slot. 
 I have also played around with the z-index as the cards had a nasty habit of dragging under other cards or slots.
 
+Click on a card to rotate the card to show the reverse.
+
 The script drag2.js is a slightly patched version of the one I lifted from David Flanagan's (well thumbed) 
-"Javascipt The Definitive Guide", a must for any javascript hackers.
+"Javascipt The Definitive Guide", a must for any javascript hackers. I have also used Flanagan's script animateCSS.js
