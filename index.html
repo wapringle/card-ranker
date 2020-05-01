@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Test 01</title>
+    <link rel="stylesheet" href="./include/style.css">
+  </head>
+  <body>
+  
+  <form id="board" style="background-color: grey;">
+        
+    <script src="include/card01.js"></script>
+    <script src="include/drag2.js"></script>
+    <script src="include/animateCSS.js"></script>
+  <!--
+yyy
+      <!-- Define the element to be dragged->
+      <div style="position:absolute; left: 100px; top: 100px; width: 250px; height: 150px; background-color: white; border: solid black;">
+      <!-- define the handle to drag it with->
+      <div style="background-color: gray; border-bottom: dotted black; padding: 3px; font-family: sans-serif; font-weight: bold;"
+      onmousedown="drag(this.parentNode, event);">
+      Drag Me <!-- The content of the "titlebar"->
+      </div>
+      <p> This is a test. Testing, testing, testing.<p>This is a test.<p>Test.
+      </div>
+    
+-->
+
+    </form>
+    
+    <script>
+    window.onload = function () {
+    
+      CreateCards();
+      //Our code here...
+    };
+    </script>
+  </body>
+</html>
