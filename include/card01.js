@@ -161,6 +161,7 @@ Rank.prototype.contains=function(x,y) {
 var rankSlots=[];
 var assignedSlots=[];
 var activeSlot=-1;
+var shuffling=false;
 function CreateCards() {
     var board = document.getElementById('board');
     for (var i=0;i<deck.length; i++) {
@@ -183,6 +184,7 @@ function mouseoverRank(x,y) {
     /*
      * What happens when mouse enters or leaves target landing pad
      */
+    if(shuffling) return;
     if(activeSlot>=0)
         if(rankSlots[activeSlot].contains(x,y))
             return;
@@ -201,51 +203,62 @@ function mouseoverRank(x,y) {
     }
 
 }
-function moveCard(from,to) {
+var shuffleFrom=null;
+var shuffleDown=true;
+
+function shuffleCards(card) {
     /*
-     * Move a card from an assigned slot to an unassigned one
+     * This routine shuffles cards one at a time by recursive calls from animateCSS
      */
-    console.log("move "+from+" to "+to);
-    assignedSlots[to]=assignedSlots[from];
-    with(rankSlots[to].div) {
-        appendChild(assignedSlots[from]);
-    }
-    delta_left=rankSlots[to].left - rankSlots[from].left;
-    delta_top=rankSlots[to].top - rankSlots[from].top;
-    frameCount=10;
-    with(assignedSlots[to]) {
-        style.left = "0px";
-        style.top =  "0px";
+    var oldslot=shuffleFrom;
+    if(assignedSlots[shuffleFrom]!=null) {
+        var src=assignedSlots[shuffleFrom];
+        var to= shuffleDown? shuffleFrom+1 : shuffleFrom-1;
+        var delta_left=rankSlots[to].left - rankSlots[shuffleFrom].left;
+        var delta_top=rankSlots[to].top - rankSlots[shuffleFrom].top;
+        var frameCount=10;
+
+        with(rankSlots[to].div) {
+            appendChild(src);
+        }
         
+        
+        with(src) {
+            style.left = "0px";
+            style.top =  shuffleDown? "-"+delta_top+"px" : (-delta_top) +"px";
+            
+        }
+        
+        /*
+         * This bit animates moving the cards between slots. Unecessary but cool. 
+         * Another Flanagan script
+         */
+        shuffleFrom=to;
+        animateCSS(src,frameCount,30,{ 
+            top:  function(frame,time) { return delta_top/frameCount*(frame - frameCount +1) +  "px"; },
+            left: function(frame,time) { return delta_left/frameCount*(frame - frameCount +1) + "px"; }
+        },shuffleCards);
     }
-    /*
-     * This bit animates moving the cards between slots. Unecessary but cool. 
-     * Another Flanagan script
-     */
-    animateCSS(assignedSlots[to],frameCount,20,{ 
-        top:  function(frame,time) { return delta_top/frameCount*(frame - frameCount +1) +  "px"; },
-        left: function(frame,time) { return delta_left/frameCount*(frame - frameCount +1) + "px"; }
-    });
-    
-    
-    
+    assignedSlots[oldslot]=card;
 }
 
-
-function snapoverRank(elementToDrag,x,y) {
+function snapoverRank(elementToDrag) {
+    console.log("snapover",activeSlot);
+    shuffling=true;
     elementToDrag.className='card';
     elementToDrag.style.zIndex=1;
-    if(activeSlot>=0) {
+    var as=activeSlot; /* activeSlot appears to be overridden when this is running */
+    if(as>=0) {
         /*
          * Card has landed over a destination slot. Snap it to slot.
          */
-        var as=activeSlot; /* activeSlot appears to be overridden when this is running */
         for(var i=0;i<assignedSlots.length;i++) {
             if(assignedSlots[i]==elementToDrag) {
                 /*
                  * Card has been moved from a ranking slot. Deassign it
                  */
                  assignedSlots[i]=null;
+                 break;
             }
         }
         if(assignedSlots[as]!=null) {
@@ -254,24 +267,22 @@ function snapoverRank(elementToDrag,x,y) {
              * If there is a lower priority slot free, shuffle down, else shuffle up.
              */
             var moved=false;
+            shuffleFrom=as;
             for(var i=as+1;i<assignedSlots.length;i++) {
                 if(assignedSlots[i]==null) {
-                    for(var j=i-1;j>=as;j--) {
-                        moveCard(j,j+1);
-                        moved=true;
-                    }
+                    shuffleDown=true;
+                    shuffleCards(elementToDrag);
+                    moved=true;
                     break;
                 }
             }
-            if(!moved) 
-                for(var i=as;i>=0;i--) {
-                    if(assignedSlots[i]==null) {
-                        for(var j=i;j<as;j++) {
-                            moveCard(j+1,j);
-                        }
-                        break;
-                    }
-                }
+            if(!moved) {
+                    shuffleDown=false;
+                    shuffleCards(elementToDrag);
+            }
+        } else {
+                activeSlot= -1;
+
         }
         /* 
          * Card now safely assigned to slot, make the visuals correct.
@@ -282,12 +293,13 @@ function snapoverRank(elementToDrag,x,y) {
         }
         assignedSlots[as]=elementToDrag;
         ret=[0,0]; /* card child of slot, so position relative to slot */
-        activeSlot= -1;
+        shuffling=false;
         return ret;
     } else 
         /*
          * Not over a slot, so snap back to original position
          */
+        shuffling=false;
         return [];
 }
 
