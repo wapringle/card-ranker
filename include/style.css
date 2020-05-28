@@ -17,6 +17,7 @@ div.card {
     z-index: 1;
     background-color: white; 
     border: solid black;    
+    border-radius: 10px;
 }
 
 div.rank {
@@ -24,6 +25,7 @@ div.rank {
     */
     background-color: white; 
     border: solid black;    
+    border-radius: 10px;
 }
 
 img {
