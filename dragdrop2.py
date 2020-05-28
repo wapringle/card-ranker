@@ -1,3 +1,5 @@
+import sys
+sys.path.append("z:/brython")
 from browser import document,html
 
 """ translate css strings
@@ -126,7 +128,6 @@ def mymouseup(ev):
     id=ev.currentTarget.id
     document[id].parent.style["zIndex"] = 0
     
-    
 class Card():
     def __init__(self,cardno):
         self.cardno=cardno
@@ -138,10 +139,11 @@ class Card():
         jpg=self.content[front]
         return html.DIV(html.IMG(src='include/'+jpg, style={"border-radius": "inherit"}), style={'margin': px(4),   "height": px(height-40), "border-radius": "inherit"})
     def create(self,left,top):
+        self.id=f'C{self.cardno}'
         card=html.DIV(
             id=f'C{self.cardno}',
             Class="card",
-            style={"position":"absolute", "left": px(left), "top": px(top), "width": px(width), "height": px(height),  "border-radius": px(10)},
+            style={"position":"absolute", "left": px(left), "top": px(top), "width": px(width), "height": px(height),  "border-radius": px(10), "background-color": "lightblue"},
             )
         card.draggable = True
         card.bind("dragstart", mydragstart)
@@ -163,15 +165,12 @@ class Card():
    
 
 def mydrop(ev):
-    """Function attached to the destination zone.
-    Describes what happens when the object is dropped, ie when the mouse is
-    released while the object is over the zone.
-    """
     # retrieve data stored in drag_start (the draggable element's id)
     src_id = ev.dataTransfer.getData('text')
     elt = document[src_id]
     
     id=id=ev.currentTarget.id # target
+    snapoverRank(src_id,id )
     document[id].appendChild(document[src_id])
     # set the new coordinates of the dragged object
     elt.style.left = px(margin) #{}px".format(ev.x - m0[0])
@@ -189,6 +188,7 @@ class Rank():
         self.rankno=rankno
                             
     def create(self,left,top):
+        self.id=f'R{self.rankno}'
         rank=html.DIV(html.DIV(str(self.rankno),style={'font-size': 'xx-large', 'text-align': 'left', 'margin': px(20)}),
             id=f'R{self.rankno}',
             Class='rank',
@@ -218,6 +218,72 @@ def createCards() :
         document <= r.create(lhmargin+(width+rhmargin)*(col+1),topmargin+(height+gap)*row)
         rankSlots.append(r)
         assignedSlots.append(None)
-        
+    
+    
+def snapoverRank(card_id,rank_id):
+    print(f"snapover {card_id} {rank_id} {assignedSlots} {[i.id for i in rankSlots]}")
+    cardCount=len(deck)
+    for i in range(cardCount):
+        if assignedSlots[i]==card_id:
+            assignedSlots[i]=None
+    for r in range(cardCount):
+        if rankSlots[r].id ==rank_id:
+            # this is our slot
+            if assignedSlots[r]==None:
+                assignedSlots[r]=card_id
+                print(f"assignedSlots {assignedSlots}")
+                
+            else:
+                moved=False
+                for a in range(r+1,cardCount):
+                    if assignedSlots[a]==None:
+                        for j in range(a,r,-1):
+                            movecard(j-1,j)
+                        assignedSlots[r]=card_id
+                        moved=True
+                        break
+                if not moved:
+                    for i in range(r-1,-1,-1):
+                        if assignedSlots[i]==None:
+                            for j in range(i,r):
+                                movecard(j+1,j)
+                            assignedSlots[r]=card_id
+                            break
+            
+            break
+    pass
+
+
+def movecard(i,j):
+    document[rankSlots[j].id].appendChild(document[assignedSlots[i]])
+    assignedSlots[j]=assignedSlots[i]
+    print(f"move {assignedSlots[i]} to {j}")
+
 createCards()
+
+if False:
+    for i in range(len(deck)):
+        rankSlots.append(f"R{i}")
+        assignedSlots.append(None)
+        
+        
+    snapoverRank("C0","R0")
+    print()
+    snapoverRank("C1","R0")
+    print()
+    snapoverRank("C2","R0")
+    print()
+    snapoverRank("C3","R0")
+    print(assignedSlots)
+    print()
+    snapoverRank("C3","R3")
+    print(assignedSlots)
+    snapoverRank("C3","R3")
+    print(assignedSlots)
+    snapoverRank("C3","R0")
+    print(assignedSlots)
+    
+    i=1
+    pass
+    
 
