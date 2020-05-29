@@ -1,6 +1,6 @@
 import sys
 sys.path.append("z:/brython")
-from browser import document,html
+from browser import document,html,timer
 
 """ translate css strings
 import re
@@ -13,7 +13,7 @@ m0 = [None, None]
 
 def mouseover(ev):
     """When mouse is over the draggable element, change cursor."""
-    print('mouse over ! ')
+    #print('mouse over ! ')
     ev.target.style.cursor = "move"
 
 
@@ -113,7 +113,7 @@ def px(x):
 
 
 def mymouseover(ev):
-    print(ev.currentTarget.id)
+    #print(ev.currentTarget.id)
     mouseover(ev)
     
 def mydragstart(ev):
@@ -158,9 +158,7 @@ class Card():
         header.bind("mouseup", mymouseup)
         
         body=self.get_body_text()
-        
         card <= header + body
-        
         return card
    
 
@@ -168,13 +166,12 @@ def mydrop(ev):
     # retrieve data stored in drag_start (the draggable element's id)
     src_id = ev.dataTransfer.getData('text')
     elt = document[src_id]
-    
-    id=id=ev.currentTarget.id # target
-    snapoverRank(src_id,id )
-    document[id].appendChild(document[src_id])
+    rank_id=ev.currentTarget.id # target
+    snapoverRank(src_id,rank_id )
+    document[rank_id].appendChild(document[src_id])
     # set the new coordinates of the dragged object
-    elt.style.left = px(margin) #{}px".format(ev.x - m0[0])
-    elt.style.top =  px(margin) #"{}px".format(ev.y - m0[1])
+    elt.style.left = px(margin) 
+    elt.style.top =  px(margin) 
     # don't drag the object any more
     #elt.draggable = False
     # remove the callback function
@@ -199,10 +196,8 @@ class Rank():
         rank.bind("dragover", dragover)
         return rank
         
-
 rankSlots=[]
 assignedSlots=[]
-activeSlot=-1
 
 def createCards() :
     cardCount=len(deck)
@@ -219,9 +214,89 @@ def createCards() :
         rankSlots.append(r)
         assignedSlots.append(None)
     
+def animateCSS(element, numFrames, timePerFrame, animation, whendone):
+    """ Adapted from Flanagan's javascript version
+    """
+    global frame, time
+    frame = 0 #  // Store current frame number
+    time = 0.0 #   // Store total elapsed time
+    """
+    // Arrange to call displayNextFrame() every timePerFrame milliseconds.
+    // This will display each of the frames of the animation.
+    """
+    intervalId=None
+    def displayNextFrame():
+        global frame,time
+#        print(frame,numFrames,time)
+        if frame >= numFrames: #             #// First, see if we're done
+            timer.clear_interval(intervalId) #// If so, stop calling ourselves
+            if whendone:
+                whendone() #// Invoke whendone function
+            return
+
+
+        for cssprop in animation:
+            """
+                // For each property, call its animation function, passing the
+                // frame number and the elapsed time. Use the return value of the
+                // function as the new value of the corresponding style property
+                // of the specified element. Use try/catch to ignore any
+                // exceptions caused by bad return values.
+            """
+            element.style[cssprop] = animation[cssprop](frame, time);
+        
+        frame+=1  #               // Increment the frame number
+        time += timePerFrame  #// Increment the elapsed time
+        
+
+    intervalId = timer.set_interval(displayNextFrame, timePerFrame)
+    
+    """
+    // The call to animateCSS() returns now, but the previous line ensures that
+    // the following nested function will be invoked once for each frame
+    // of the animation.
+
+    // Now loop through all properties defined in the animation object
+    """
+
+
+def shuffleCards():
+    """
+    This routine shuffles cards one at a time by recursive calls from animateCSS
+    """
+    global shuffleSrc,shuffleFrom, shuffleDown # parameters for call
+    oldslot=shuffleFrom
+    oldsrc=shuffleSrc
+    if assignedSlots[shuffleFrom]!=None:
+        shuffleSrc=assignedSlots[shuffleFrom]
+        to=shuffleFrom+1 if shuffleDown else shuffleFrom -1 #ither shuffle up or down
+        originRank=document[rankSlots[shuffleFrom].id]
+        targetRank=document[rankSlots[to].id]
+        delta_top=targetRank.top - originRank.top
+        delta_left=targetRank.left - originRank.left
+        frameCount=20
+        shuffleFrom=to
+        src=document[shuffleSrc]
+        def shuffle2():
+            src.style.zIndex=0
+            src.style.left = px(margin) 
+            src.style.top =  px(margin) 
+            targetRank.appendChild(src)
+            
+            timer.set_timeout(shuffleCards,110)
+        src.style.zIndex=2
+        animateCSS(src,frameCount,30,{ 
+            "top":  lambda frame,time: px(delta_top/frameCount*frame+margin) ,
+            "left": lambda frame,time:px(delta_left/frameCount*frame+margin) ,
+        },shuffle2);
+        
+        
+    assignedSlots[oldslot]=oldsrc
+    
     
 def snapoverRank(card_id,rank_id):
-    print(f"snapover {card_id} {rank_id} {assignedSlots} {[i.id for i in rankSlots]}")
+    global shuffleSrc,shuffleFrom, shuffleDown
+    #print(f"snapover {card_id} {rank_id} {assignedSlots} {[i.id for i in rankSlots]}")
     cardCount=len(deck)
     for i in range(cardCount):
         if assignedSlots[i]==card_id:
@@ -230,60 +305,28 @@ def snapoverRank(card_id,rank_id):
         if rankSlots[r].id ==rank_id:
             # this is our slot
             if assignedSlots[r]==None:
+                # it's empty, so no shuffling
                 assignedSlots[r]=card_id
-                print(f"assignedSlots {assignedSlots}")
-                
             else:
                 moved=False
+                shuffleFrom=r
                 for a in range(r+1,cardCount):
                     if assignedSlots[a]==None:
-                        for j in range(a,r,-1):
-                            movecard(j-1,j)
-                        assignedSlots[r]=card_id
+                        shuffleSrc=card_id
+                        shuffleDown=True
+                        shuffleCards()
                         moved=True
                         break
                 if not moved:
-                    for i in range(r-1,-1,-1):
-                        if assignedSlots[i]==None:
-                            for j in range(i,r):
-                                movecard(j+1,j)
-                            assignedSlots[r]=card_id
-                            break
-            
+                    # else move up, assume there is an empty slot available
+                    shuffleSrc=card_id
+                    shuffleDown=False
+                    shuffleCards()
+                    
             break
+    assignedSlots[r]=card_id
+    shuffling=False
     pass
-
-
-def movecard(i,j):
-    document[rankSlots[j].id].appendChild(document[assignedSlots[i]])
-    assignedSlots[j]=assignedSlots[i]
-    print(f"move {assignedSlots[i]} to {j}")
 
 createCards()
-
-if False:
-    for i in range(len(deck)):
-        rankSlots.append(f"R{i}")
-        assignedSlots.append(None)
-        
-        
-    snapoverRank("C0","R0")
-    print()
-    snapoverRank("C1","R0")
-    print()
-    snapoverRank("C2","R0")
-    print()
-    snapoverRank("C3","R0")
-    print(assignedSlots)
-    print()
-    snapoverRank("C3","R3")
-    print(assignedSlots)
-    snapoverRank("C3","R3")
-    print(assignedSlots)
-    snapoverRank("C3","R0")
-    print(assignedSlots)
-    
-    i=1
-    pass
-    
 
