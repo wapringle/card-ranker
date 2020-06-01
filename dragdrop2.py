@@ -1,6 +1,6 @@
-import sys
-sys.path.append("z:/brython")
 from browser import document,html,timer
+import math
+
 
 """ translate css strings
 import re
@@ -83,7 +83,7 @@ topmargin=100
 lhmargin=100
 rhmargin=100
 gap=30
-width=250
+width=230
 height=166
 margin=4
 rankWidth=width+3*margin
@@ -92,20 +92,29 @@ rankHeight=height+3*margin
 name="name"
 front="front"
 back="back"
+flipped="flipped"
+
 deck=[
-    { name: "Beijing, China", front: "beijing_front.jpg", back: "kampala_back.jpg"},
-    { name: "Delhi, India", front: "delhi_front.jpg", back: "kampala_back.jpg"},
-    { name: "Doha, Qatar ", front: "doha_front.jpg", back: "kampala_back.jpg"},
-    { name: "Istanbul, Turkey", front: "istanbul_front.jpg", back: "kampala_back.jpg"},]
-"""
+    { name: "Beijing, China", front: "beijing_front.jpg", back: "beijing_back.jpg"},
+    { name: "Bradford, England", front: "bradford_front.jpg", back: "bradford_back.jpg"},
+    { name: "Delhi, India", front: "delhi_front.jpg", back: "delhi_back.jpg"},
     { name: "Kampala, Uganda", front: "kampala_front.jpg", back: "kampala_back.jpg"},
-    { name: "Leeds, England", front: "leeds_front.jpg", back: "kampala_back.jpg"},
-    { name: "Lima, Peru", front: "lima_front.jpg", back: "kampala_back.jpg"},
-    { name: "London, England", front: "london_front.jpg", back: "kampala_back.jpg"},
-    { name: "New York, USA", front: "new_york_front.jpg", back: "kampala_back.jpg"},
-    { name: "Paris, France", front: "paris_front.jpg", back: "kampala_back.jpg"},
+    { name: "Lima, Peru", front: "lima_front.jpg", back: "lima_back.jpg"},
+    { name: "London, England", front: "london_front.jpg", back: "london_back.jpg"},
+    { name: "New York, USA", front: "new_york_front.jpg", back: "new_york_back.jpg"},
+    { name: "Paris, France", front: "paris_front.jpg", back: "paris_back.jpg"},
+]
+
+"""
+    { name: "Istanbul, Turkey", front: "istanbul_front.jpg", back: "kampala_back.jpg"},]
+    { name: "Doha, Qatar ", front: "doha_front.jpg", back: "kampala_back.jpg"},
     { name: "Sydney, Australia", front: "sydney_front.jpg", back: "kampala_back.jpg"},
     """
+def get_deck_for_card(c):
+    for dk in deck:
+        if dk["card"]==c.id:
+            return dk
+    return None; # not found - shouldn't happen haha
 
 
 def px(x):
@@ -128,16 +137,49 @@ def mymouseup(ev):
     id=ev.currentTarget.id
     document[id].parent.style["zIndex"] = 0
     
+def flipper(ev):
+    id=ev.currentTarget.parent.id
+    card=document[id]
+    frameCount=20
+    delta_width=width / frameCount
+    ll=card.offsetLeft
+    txt=card.firstChild.innerText;
+    card.firstChild.innerText="";
+    def flipper3(card):
+        card.firstChild.innerText=txt
+
+    def flipper2(card):
+        # This is called to show the reverse side 
+        dk=get_deck_for_card(card)
+        dk[flipped]= not dk[flipped]
+        img=get_body_text(dk)
+        x="I"+card.id
+        i2=document[x]
+        i2['src']=img
+        animateCSS(card,frameCount,50,{ 
+            "width":  lambda frame,time: px((width * math.cos((frameCount - frame -1 )/frameCount * math.pi / 2))),
+            "left":  lambda frame,time: px((ll+width/2 - (width * math.cos((frameCount - frame -1 )/frameCount * math.pi / 2))/2) ),
+        },flipper3)
+    
+    animateCSS(card,frameCount,25,{ 
+        'width':  lambda frame,time: px(width * math.cos((frame+1)/frameCount * math.pi / 2)) ,
+        'left':  lambda frame,time: px(ll+width/2 - (width * math.cos((frame+1)/frameCount * math.pi / 2))/2),
+    },flipper2);
+
+
+
+    
+
+def get_body_text(content):
+    side = back if content[flipped] else front
+    jpg=content[side]
+    return 'include/'+jpg
+
 class Card():
     def __init__(self,cardno):
         self.cardno=cardno
         self.content=deck[cardno]
                             
-    def get_body_text(self):
-        body_height=height - 20; # a guess
-        
-        jpg=self.content[front]
-        return html.DIV(html.IMG(src='include/'+jpg, style={"border-radius": "inherit"}), style={'margin': px(4),   "height": px(height-40), "border-radius": "inherit"})
     def create(self,left,top):
         self.id=f'C{self.cardno}'
         card=html.DIV(
@@ -150,14 +192,16 @@ class Card():
         
         header= html.DIV(self.content[name],
             id=f'H{self.cardno}',
-            style={'background-color': 'gray', 'border-bottom': 'dotted black', 'padding': '3px', 'font-family': 'sans-serif', 'font-weight': 'bold',  "border-radius": "inherit", "margin": px(4),}
+            style={ 'height': px(20), 'background-color':'gray', 'border-bottom': 'dotted black', 'padding': '3px', 'font-family': 'sans-serif', 'font-weight': 'bold',  "border-radius": "inherit", "margin": px(4),}
 
         )
         header.bind("mouseover", mymouseover)
         header.bind("mousedown", mymousedown)
         header.bind("mouseup", mymouseup)
-        
-        body=self.get_body_text()
+        body_height=height - 20; # a guess
+        img=get_body_text(self.content)
+        body = html.DIV(html.IMG(src=img, id="I"+self.id, style={"border-radius": "inherit"}), style={'margin': px(4),   "height": px(height-40), "border-radius": "inherit"})
+        body.bind("mousedown",flipper)
         card <= header + body
         return card
    
@@ -200,19 +244,42 @@ rankSlots=[]
 assignedSlots=[]
 
 def createCards() :
+    global deck
     cardCount=len(deck)
     print(cardCount)
     for i in range(cardCount):
-        cc=Card(i)   
-        document <= cc.create(lhmargin,topmargin+i*(height + gap))
-    
-    for i in range(cardCount):
         r=Rank(i+1)
-        row = i % 4
-        col = (i - row)/4
-        document <= r.create(lhmargin+(width+rhmargin)*(col+1),topmargin+(height+gap)*row)
+        col = i % 4
+        row = (i - col)/4
+        document <= r.create(lhmargin+(width+rhmargin)*(col),topmargin+(height+gap)*row)
         rankSlots.append(r)
         assignedSlots.append(None)
+
+    for i in range(cardCount):
+        deck[i][flipped]=False
+        cc=Card(i)   
+ 
+        col = i % 4
+        row = (i - col)/4
+        if False:
+            document <= cc.create(lhmargin+(width+rhmargin)*(col),topmargin+(height+gap)*(row+2))
+            deck[i]["card"]=cc.id
+        else:
+            document <= cc.create(px(margin),px(margin))
+            deck[i]["card"]=cc.id
+            
+    for i in range(cardCount):
+        src_id=deck[i]["card"]
+        rank_id=rankSlots[i].id
+        snapoverRank(src_id,rank_id )
+        document[f'R{i+1}'].appendChild(document[src_id])
+        elt=document[src_id]
+        elt.style.left = px(margin) 
+        elt.style.top =  px(margin) 
+        
+        
+        
+    
     
 def animateCSS(element, numFrames, timePerFrame, animation, whendone):
     """ Adapted from Flanagan's javascript version
@@ -231,7 +298,7 @@ def animateCSS(element, numFrames, timePerFrame, animation, whendone):
         if frame >= numFrames: #             #// First, see if we're done
             timer.clear_interval(intervalId) #// If so, stop calling ourselves
             if whendone:
-                whendone() #// Invoke whendone function
+                whendone(element) #// Invoke whendone function
             return
 
 
@@ -277,14 +344,14 @@ def shuffleCards():
         frameCount=20
         shuffleFrom=to
         src=document[shuffleSrc]
-        def shuffle2():
-            src.style.zIndex=0
+        def shuffle2(src):
+            #src.style.zIndex=0
             src.style.left = px(margin) 
             src.style.top =  px(margin) 
             targetRank.appendChild(src)
             
             timer.set_timeout(shuffleCards,110)
-        src.style.zIndex=2
+        #src.style.zIndex=2
         animateCSS(src,frameCount,30,{ 
             "top":  lambda frame,time: px(delta_top/frameCount*frame+margin) ,
             "left": lambda frame,time:px(delta_left/frameCount*frame+margin) ,
@@ -329,4 +396,3 @@ def snapoverRank(card_id,rank_id):
     pass
 
 createCards()
-
