@@ -79,10 +79,10 @@ source.bind("mouseover", mouseover)
 source.bind("dragstart", dragstart)
 """
 
-topmargin=100
-lhmargin=100
-rhmargin=100
-gap=30
+topmargin=40
+lhmargin=40
+rhmargin=40
+gap=20
 width=230
 height=166
 margin=4
@@ -129,14 +129,20 @@ def mymouseover(ev):
     mouseover(ev)
     
 def mydragstart(ev):
-    global sema4
+    global sema4,m0
     id=ev.currentTarget.id
     dragstart(ev)
+    # compute mouse offset
+    # ev.x and ev.y are the coordinates of the mouse when the event is fired
+    # ev.target is the dragged element. Its attributes "left" and "top" are
+    # integers, the distance from the left and top borders of the document
+    m0 = [ev.x - document[id].left, ev.y - document[id].top]
     if sema4:
         ev.dataTransfer.effectAllowed = "none"
     
 def mymousedown(ev):
     id=ev.currentTarget.id
+    print(f"mousedown {id}")
     document[id].parent.style.zIndex = 2
     
 def mymouseup(ev):
@@ -207,19 +213,20 @@ class Card():
         header.bind("mouseup", mymouseup)
         body_height=height - 20; # a guess
         img=get_body_text(self.content)
-        body = html.DIV(html.IMG(src=img, id="I"+self.id, style={"border-radius": "inherit"}), style={'margin': px(4),   "height": px(height-40), "border-radius": "inherit"})
-        body.bind("mousedown",flipper)
+        body = html.DIV(html.IMG(src=img, id="I"+self.id, style={"border-radius": "inherit"}), style={'margin': px(4),   "height": px(height-40), "border-radius": "inherit"},id="B"+self.id)
+
+        body.bind("dblclick",flipper)
         card <= header + body
         return card
    
 
 def mydrop(ev):
     # retrieve data stored in drag_start (the draggable element's id)
-    src_id = ev.dataTransfer.getData('text')
+    src_id = change_card_id(ev.dataTransfer.getData('text'))
     elt = document[src_id]
     rank_id=ev.currentTarget.id # target
     snapoverRank(src_id,rank_id )
-    document[rank_id].appendChild(document[src_id if src_id[0]!= 'I' else src_id[1:]])
+    document[rank_id].appendChild(document[src_id])
     # set the new coordinates of the dragged object
     elt.style.left = px(margin) 
     elt.style.top =  px(margin) 
@@ -227,6 +234,21 @@ def mydrop(ev):
     #elt.draggable = False
     # remove the callback function
     #elt.unbind("mouseover")
+    elt.style.cursor = "auto"
+    ev.preventDefault()
+
+        
+def playdrop(ev):
+    global m0
+    # retrieve data stored in drag_start (the draggable element's id)
+    src_id = change_card_id(ev.dataTransfer.getData('text'))
+    elt = document[src_id]
+
+    remove_from_slot(change_card_id(src_id))
+    
+    # set the new coordinates of the dragged object
+    elt.style.left = px(ev.x - m0[0])
+    elt.style.top = px(ev.y - m0[1])
     elt.style.cursor = "auto"
     ev.preventDefault()
 
@@ -269,12 +291,23 @@ def createCards() :
         col = i % 4
         row = (i - col)/4
         if False:
-            document <= cc.create(lhmargin+(width+rhmargin)*(col),topmargin+(height+gap)*(row+2))
-            deck[i]["card"]=cc.id
+            document <= cc.create(lhmargin+(width+rhmargin)*(col),topmargin+(height+gap)*(row+3))
         else:
-            document <= cc.create(px(margin),px(margin))
-            deck[i]["card"]=cc.id
-            
+            document <= cc.create(lhmargin,topmargin+(height+gap)*3 +gap*i)
+        deck[i]["card"]=cc.id
+        
+    play =html.DIV("Hello",
+        id='play',
+        Class='rank',
+        style={"position":"absolute", "left": px(lhmargin), "top": px(topmargin+(height+gap)*2 ), "width": px(4*width+3*rhmargin+12), "height": px(3*rankHeight)},
+        )
+    play.bind("dragover", dragover)
+    
+    play.bind("drop", playdrop)
+    document <= play
+    
+    
+"""
     for i in range(cardCount):
         src_id=deck[i]["card"]
         rank_id=rankSlots[i].id
@@ -283,6 +316,7 @@ def createCards() :
         elt=document[src_id]
         elt.style.left = px(margin) 
         elt.style.top =  px(margin) 
+"""            
         
         
         
@@ -355,7 +389,7 @@ def shuffleCards():
         shuffleFrom=to
         if assignedSlots[to]:
             targetRank.style.zIindex=0
-            #document[assignedSlots[to]].style.zIindex=0
+            document[assignedSlots[to]].style.zIindex=0
         src=document[shuffleSrc]
         def shuffle2(src):
             src.style.left = px(margin) 
@@ -363,7 +397,7 @@ def shuffleCards():
             targetRank.appendChild(src)
             if assignedSlots[to]:
                 targetRank.style.zIindex=1
-                #document[assignedSlots[to]].style.zIindex=1
+                document[assignedSlots[to]].style.zIindex=1
             shuffleCards()
         animateCSS(src,frameCount,30,{ 
             "top":  lambda frame,time: px(delta_top/frameCount*frame+margin) ,
@@ -373,19 +407,30 @@ def shuffleCards():
         
     assignedSlots[oldslot]=oldsrc
     
+def change_card_id(card_id):
+    if card_id[0]=='I':
+        # dragging using picture, change id to card
+        return card_id[1:]
+    else:
+        return card_id
+        
+    
+def remove_from_slot(card_id):
+    cardCount=len(deck)
+    for i in range(cardCount):
+        if assignedSlots[i]==card_id:
+            assignedSlots[i]=None
+            break
     
 def snapoverRank(card_id,rank_id):
     global shuffleSrc,shuffleFrom, shuffleDown
     global sema4
     #print(f"snapover {card_id} {rank_id} {assignedSlots} {[i.id for i in rankSlots]}")
-    if card_id[0]=='I':
-        # dragging using picture, change id to card
-        card_id=card_id[1:]
-    
     cardCount=len(deck)
-    for i in range(cardCount):
-        if assignedSlots[i]==card_id:
-            assignedSlots[i]=None
+    card_id=change_card_id(card_id)
+    remove_from_slot(card_id)
+        
+        
     for r in range(cardCount):
         if rankSlots[r].id ==rank_id:
             # this is our slot
