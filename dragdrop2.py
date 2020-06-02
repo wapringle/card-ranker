@@ -212,7 +212,7 @@ def mydrop(ev):
     elt = document[src_id]
     rank_id=ev.currentTarget.id # target
     snapoverRank(src_id,rank_id )
-    document[rank_id].appendChild(document[src_id])
+    document[rank_id].appendChild(document[src_id if src_id[0]!= 'I' else src_id[1:]])
     # set the new coordinates of the dragged object
     elt.style.left = px(margin) 
     elt.style.top =  px(margin) 
@@ -272,7 +272,7 @@ def createCards() :
         src_id=deck[i]["card"]
         rank_id=rankSlots[i].id
         snapoverRank(src_id,rank_id )
-        document[f'R{i+1}'].appendChild(document[src_id])
+        document[rank_id].appendChild(document[src_id if src_id[0]!= 'I' else src_id[1:]])
         elt=document[src_id]
         elt.style.left = px(margin) 
         elt.style.top =  px(margin) 
@@ -364,6 +364,9 @@ def shuffleCards():
 def snapoverRank(card_id,rank_id):
     global shuffleSrc,shuffleFrom, shuffleDown
     #print(f"snapover {card_id} {rank_id} {assignedSlots} {[i.id for i in rankSlots]}")
+    if card_id[0]=='I':
+        card_id=card_id[1:]
+    
     cardCount=len(deck)
     for i in range(cardCount):
         if assignedSlots[i]==card_id:
