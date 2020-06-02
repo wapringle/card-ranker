@@ -110,6 +110,9 @@ deck=[
     { name: "Doha, Qatar ", front: "doha_front.jpg", back: "kampala_back.jpg"},
     { name: "Sydney, Australia", front: "sydney_front.jpg", back: "kampala_back.jpg"},
     """
+
+sema4=False
+
 def get_deck_for_card(c):
     for dk in deck:
         if dk["card"]==c.id:
@@ -126,16 +129,19 @@ def mymouseover(ev):
     mouseover(ev)
     
 def mydragstart(ev):
+    global sema4
     id=ev.currentTarget.id
     dragstart(ev)
+    if sema4:
+        ev.dataTransfer.effectAllowed = "none"
     
 def mymousedown(ev):
     id=ev.currentTarget.id
-    document[id].parent.style["zIndex"] = 2
+    document[id].parent.style.zIndex = 2
     
 def mymouseup(ev):
     id=ev.currentTarget.id
-    document[id].parent.style["zIndex"] = 0
+    document[id].parent.style.zIndex= 1
     
 def flipper(ev):
     id=ev.currentTarget.parent.id
@@ -156,12 +162,12 @@ def flipper(ev):
         x="I"+card.id
         i2=document[x]
         i2['src']=img
-        animateCSS(card,frameCount,50,{ 
+        animateCSS(card,frameCount,30,{ 
             "width":  lambda frame,time: px((width * math.cos((frameCount - frame -1 )/frameCount * math.pi / 2))),
             "left":  lambda frame,time: px((ll+width/2 - (width * math.cos((frameCount - frame -1 )/frameCount * math.pi / 2))/2) ),
         },flipper3)
     
-    animateCSS(card,frameCount,25,{ 
+    animateCSS(card,frameCount,30,{ 
         'width':  lambda frame,time: px(width * math.cos((frame+1)/frameCount * math.pi / 2)) ,
         'left':  lambda frame,time: px(ll+width/2 - (width * math.cos((frame+1)/frameCount * math.pi / 2))/2),
     },flipper2);
@@ -188,6 +194,7 @@ class Card():
             style={"position":"absolute", "left": px(left), "top": px(top), "width": px(width), "height": px(height),  "border-radius": px(10), "background-color": "lightblue"},
             )
         card.draggable = True
+        card.style.zIndex=1
         card.bind("dragstart", mydragstart)
         
         header= html.DIV(self.content[name],
@@ -332,9 +339,12 @@ def shuffleCards():
     This routine shuffles cards one at a time by recursive calls from animateCSS
     """
     global shuffleSrc,shuffleFrom, shuffleDown # parameters for call
+    global sema4
     oldslot=shuffleFrom
     oldsrc=shuffleSrc
-    if assignedSlots[shuffleFrom]!=None:
+    if assignedSlots[shuffleFrom]==None:
+        sema4=False
+    else:
         shuffleSrc=assignedSlots[shuffleFrom]
         to=shuffleFrom+1 if shuffleDown else shuffleFrom -1 #ither shuffle up or down
         originRank=document[rankSlots[shuffleFrom].id]
@@ -343,15 +353,18 @@ def shuffleCards():
         delta_left=targetRank.left - originRank.left
         frameCount=20
         shuffleFrom=to
+        if assignedSlots[to]:
+            targetRank.style.zIindex=0
+            #document[assignedSlots[to]].style.zIindex=0
         src=document[shuffleSrc]
         def shuffle2(src):
-            #src.style.zIndex=0
             src.style.left = px(margin) 
             src.style.top =  px(margin) 
             targetRank.appendChild(src)
-            
-            timer.set_timeout(shuffleCards,110)
-        #src.style.zIndex=2
+            if assignedSlots[to]:
+                targetRank.style.zIindex=1
+                #document[assignedSlots[to]].style.zIindex=1
+            shuffleCards()
         animateCSS(src,frameCount,30,{ 
             "top":  lambda frame,time: px(delta_top/frameCount*frame+margin) ,
             "left": lambda frame,time:px(delta_left/frameCount*frame+margin) ,
@@ -363,8 +376,10 @@ def shuffleCards():
     
 def snapoverRank(card_id,rank_id):
     global shuffleSrc,shuffleFrom, shuffleDown
+    global sema4
     #print(f"snapover {card_id} {rank_id} {assignedSlots} {[i.id for i in rankSlots]}")
     if card_id[0]=='I':
+        # dragging using picture, change id to card
         card_id=card_id[1:]
     
     cardCount=len(deck)
@@ -377,7 +392,9 @@ def snapoverRank(card_id,rank_id):
             if assignedSlots[r]==None:
                 # it's empty, so no shuffling
                 assignedSlots[r]=card_id
+                break
             else:
+                sema4=True
                 moved=False
                 shuffleFrom=r
                 for a in range(r+1,cardCount):
