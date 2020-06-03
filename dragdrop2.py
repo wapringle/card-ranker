@@ -1,4 +1,4 @@
-from browser import document,html,timer
+from browser import document,html,timer,window
 import math
 
 
@@ -281,6 +281,16 @@ def createCards() :
     """ 
     Use this as a container for ranking slots. 
     """
+    print(window.innerHeight,window.innerWidth)
+    play =html.DIV("",
+        id='play',
+        Class='play',
+        style={"position":"absolute", "left": px(0), "top": px(0 ), "width": px(window.innerWidth-100), "height": px(window.innerHeight-100)},
+        )
+    play.bind("dragover", dragover)
+    
+    play.bind("drop", playdrop)
+    document <= play
     x = html.DIV("",id="Cool as a penguin's sit-upon",style={"position":"absolute", "left": px(0), "top": px(0), "width": px(1), "height": px(1)},)
     document <= x
     cardCount=len(deck)
@@ -293,15 +303,6 @@ def createCards() :
         rankSlots.append(r)
         assignedSlots.append(None)
 
-    play =html.DIV("",
-        id='play',
-        Class='play',
-        style={"position":"absolute", "left": px(lhmargin), "top": px(topmargin+(height+gap)*2 ), "width": px(4*width+3*rhmargin+12), "height": px(3*rankHeight-100)},
-        )
-    play.bind("dragover", dragover)
-    
-    play.bind("drop", playdrop)
-    document <= play
 
     for i in range(cardCount):
         deck[i][flipped]=False
@@ -309,10 +310,10 @@ def createCards() :
  
         col = i % 4
         row = (i - col)/4
-        if True:
+        if False:
             play <= cc.create(lhmargin,lhmargin +30*i)
         else:
-            document <= cc.create(lhmargin,topmargin+(height+gap)*2 +30*i)
+            play <= cc.create(lhmargin,topmargin+(height+gap)*2 +30*i)
         deck[i]["card"]=cc.id
         
     
