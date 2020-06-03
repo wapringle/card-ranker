@@ -27,6 +27,13 @@ div.rank {
     border: solid black;    
     border-radius: 10px;
 }
+div.play {
+    /*z-index: 0; 
+    */
+    background-color: #698b47; 
+    border: solid black;    
+    border-radius: 10px;
+}
 
 img {
     width: 100%;
