@@ -293,12 +293,12 @@ def createCards() :
         if False:
             document <= cc.create(lhmargin+(width+rhmargin)*(col),topmargin+(height+gap)*(row+3))
         else:
-            document <= cc.create(lhmargin,topmargin+(height+gap)*3 +gap*i)
+            document <= cc.create(lhmargin,topmargin+(height+gap)*2 +30*i)
         deck[i]["card"]=cc.id
         
-    play =html.DIV("Hello",
+    play =html.DIV("",
         id='play',
-        Class='rank',
+        Class='play',
         style={"position":"absolute", "left": px(lhmargin), "top": px(topmargin+(height+gap)*2 ), "width": px(4*width+3*rhmargin+12), "height": px(3*rankHeight)},
         )
     play.bind("dragover", dragover)
