@@ -137,12 +137,12 @@ def mydragstart(ev):
     # ev.target is the dragged element. Its attributes "left" and "top" are
     # integers, the distance from the left and top borders of the document
     m0 = [ev.x - document[id].left, ev.y - document[id].top]
+    #print(f"dragstart {m0}")
     if sema4:
         ev.dataTransfer.effectAllowed = "none"
     
 def mymousedown(ev):
     id=ev.currentTarget.id
-    print(f"mousedown {id}")
     document[id].parent.style.zIndex = 2
     
 def mymouseup(ev):
@@ -215,6 +215,7 @@ class Card():
         img=get_body_text(self.content)
         body = html.DIV(html.IMG(src=img, id="I"+self.id, style={"border-radius": "inherit"}), style={'margin': px(4),   "height": px(height-40), "border-radius": "inherit"},id="B"+self.id)
 
+        body.bind("mouseover", mouseover)
         body.bind("dblclick",flipper)
         card <= header + body
         return card
@@ -243,12 +244,15 @@ def playdrop(ev):
     # retrieve data stored in drag_start (the draggable element's id)
     src_id = change_card_id(ev.dataTransfer.getData('text'))
     elt = document[src_id]
+    remove_from_slot(change_card_id(src_id)) # in case card was in a raking slot
+    target=ev.currentTarget
 
-    remove_from_slot(change_card_id(src_id))
-    
     # set the new coordinates of the dragged object
-    elt.style.left = px(ev.x - m0[0])
-    elt.style.top = px(ev.y - m0[1])
+    elt.style.left= px(ev.x-target.left+elt.parent.left-m0[0])
+    elt.style.top = px(ev.y-target.top+elt.parent.top-m0[1])
+
+    document["play"].appendChild(document[change_card_id(src_id)])
+    
     elt.style.cursor = "auto"
     ev.preventDefault()
 
@@ -274,15 +278,30 @@ assignedSlots=[]
 
 def createCards() :
     global deck
+    """ 
+    Use this as a container for ranking slots. 
+    """
+    x = html.DIV("",id="Cool as a penguin's sit-upon",style={"position":"absolute", "left": px(0), "top": px(0), "width": px(1), "height": px(1)},)
+    document <= x
     cardCount=len(deck)
-    print(cardCount)
-    for i in range(cardCount):
+    #print(cardCount)
+    for i in range(cardCount): #-1,-1,-1):
         r=Rank(i+1)
         col = i % 4
         row = (i - col)/4
-        document <= r.create(lhmargin+(width+rhmargin)*(col),topmargin+(height+gap)*row)
+        x <= r.create(lhmargin+(width+rhmargin)*(col),topmargin+(height+gap)*row)
         rankSlots.append(r)
         assignedSlots.append(None)
+
+    play =html.DIV("",
+        id='play',
+        Class='play',
+        style={"position":"absolute", "left": px(lhmargin), "top": px(topmargin+(height+gap)*2 ), "width": px(4*width+3*rhmargin+12), "height": px(3*rankHeight-100)},
+        )
+    play.bind("dragover", dragover)
+    
+    play.bind("drop", playdrop)
+    document <= play
 
     for i in range(cardCount):
         deck[i][flipped]=False
@@ -290,21 +309,12 @@ def createCards() :
  
         col = i % 4
         row = (i - col)/4
-        if False:
-            document <= cc.create(lhmargin+(width+rhmargin)*(col),topmargin+(height+gap)*(row+3))
+        if True:
+            play <= cc.create(lhmargin,lhmargin +30*i)
         else:
             document <= cc.create(lhmargin,topmargin+(height+gap)*2 +30*i)
         deck[i]["card"]=cc.id
         
-    play =html.DIV("",
-        id='play',
-        Class='play',
-        style={"position":"absolute", "left": px(lhmargin), "top": px(topmargin+(height+gap)*2 ), "width": px(4*width+3*rhmargin+12), "height": px(3*rankHeight)},
-        )
-    play.bind("dragover", dragover)
-    
-    play.bind("drop", playdrop)
-    document <= play
     
     
 """
@@ -387,17 +397,17 @@ def shuffleCards():
         delta_left=targetRank.left - originRank.left
         frameCount=20
         shuffleFrom=to
-        if assignedSlots[to]:
-            targetRank.style.zIindex=0
-            document[assignedSlots[to]].style.zIindex=0
         src=document[shuffleSrc]
+        """
+        This piece of magic pops the rank to highest priority between slots. This means that
+        the shuffled card is always slid from under the origin rank and over the target rank.
+        Cool as a penguin's sit-upon.
+        """
+        document["Cool as a penguin's sit-upon"].appendChild(originRank)
         def shuffle2(src):
             src.style.left = px(margin) 
             src.style.top =  px(margin) 
             targetRank.appendChild(src)
-            if assignedSlots[to]:
-                targetRank.style.zIindex=1
-                document[assignedSlots[to]].style.zIindex=1
             shuffleCards()
         animateCSS(src,frameCount,30,{ 
             "top":  lambda frame,time: px(delta_top/frameCount*frame+margin) ,
