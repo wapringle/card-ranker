@@ -14,9 +14,7 @@ div.clicked {
 
 
 div.card {
-    z-index: 1;
-    background-color: lightblue;
-    border: solid black;    
+    border: solid white;
     border-radius: 10px;
 }
 

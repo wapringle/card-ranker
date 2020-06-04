@@ -88,6 +88,7 @@ height=166
 margin=4
 rankWidth=width+3*margin
 rankHeight=height+3*margin
+style1=True
 
 name="name"
 front="front"
@@ -141,16 +142,14 @@ def mydragstart(ev):
     if sema4:
         ev.dataTransfer.effectAllowed = "none"
     
-def mymousedown(ev):
-    id=ev.currentTarget.id
-    document[id].parent.style.zIndex = 2
-    
-def mymouseup(ev):
-    id=ev.currentTarget.id
-    document[id].parent.style.zIndex= 1
-    
+def setZindex(ev,z):
+    document[ev.currentTarget.id].parent.style.zIndex= z
+
 def flipper(ev):
-    id=ev.currentTarget.parent.id
+    if style1:
+        id=ev.currentTarget.parent.id
+    else:
+        id=ev.currentTarget.id
     card=document[id]
     frameCount=20
     delta_width=width / frameCount
@@ -165,9 +164,12 @@ def flipper(ev):
         dk=get_deck_for_card(card)
         dk[flipped]= not dk[flipped]
         img=get_body_text(dk)
-        x="I"+card.id
-        i2=document[x]
-        i2['src']=img
+        if style1:
+            x="I"+card.id
+            i2=document[x]
+            i2['src']=img
+        else:
+            document[card.id].style["background-image"]= f'url("{img}")'
         animateCSS(card,frameCount,30,{ 
             "width":  lambda frame,time: px((width * math.cos((frameCount - frame -1 )/frameCount * math.pi / 2))),
             "left":  lambda frame,time: px((ll+width/2 - (width * math.cos((frameCount - frame -1 )/frameCount * math.pi / 2))/2) ),
@@ -194,33 +196,55 @@ class Card():
                             
     def create(self,left,top):
         self.id=f'C{self.cardno}'
-        card=html.DIV(
-            id=f'C{self.cardno}',
-            Class="card",
-            style={"position":"absolute", "left": px(left), "top": px(top), "width": px(width), "height": px(height),  "border-radius": px(10), "background-color": "lightblue"},
-            )
+        img=get_body_text(self.content)
+        if style1:
+            card=html.DIV(
+                id=f'C{self.cardno}',
+                Class="card",
+                style={"position":"absolute", "left": px(left), "top": px(top), 
+                       "width": px(width), 
+                       "height": px(height),  
+                       "border-radius": px(10), 
+                       "background-color": "lightblue",
+                })
+        else:
+            card=html.DIV(
+                id=f'C{self.cardno}',
+                Class="card",
+                style={"position":"absolute", "left": px(left), "top": px(top), 
+                       "width": px(width), 
+                       "height": px(height),  
+                       "border-radius": px(10), 
+                       "background-image": f'url("{img}")',
+                       "backgroundSize": f"{width}px {height}px",
+                })
+            card.bind("mouseover", mouseover)
+            card.bind("dblclick",flipper)
+
+#        card.style.zIndex=1
+
         card.draggable = True
-        card.style.zIndex=1
         card.bind("dragstart", mydragstart)
         
         header= html.DIV(self.content[name],
             id=f'H{self.cardno}',
             style={ 'height': px(20), 'background-color':'gray', 'border-bottom': 'dotted black', 'padding': '3px', 'font-family': 'sans-serif', 'font-weight': 'bold',  "border-radius": "inherit", "margin": px(4),}
-
         )
         header.bind("mouseover", mymouseover)
-        header.bind("mousedown", mymousedown)
-        header.bind("mouseup", mymouseup)
-        body_height=height - 20; # a guess
-        img=get_body_text(self.content)
-        body = html.DIV(html.IMG(src=img, id="I"+self.id, style={"border-radius": "inherit"}), style={'margin': px(4),   "height": px(height-40), "border-radius": "inherit"},id="B"+self.id)
+        header.bind("mousedown", lambda ev: setZindex(ev,2))
+        header.bind("mouseup", lambda ev: setZindex(ev,1))
+        card <= header
+        
+        if style1:
+            body_height=height - 20; # a guess
+            img=get_body_text(self.content)
+            body = html.DIV(html.IMG(src=img, id="I"+self.id, style={"border-radius": "inherit"}), style={'margin': px(4),   "height": px(height-40), "border-radius": "inherit"},id="B"+self.id)
+            body.bind("mouseover", mouseover)
+            body.bind("dblclick",flipper)
+            card <= body
 
-        body.bind("mouseover", mouseover)
-        body.bind("dblclick",flipper)
-        card <= header + body
         return card
    
-
 def mydrop(ev):
     # retrieve data stored in drag_start (the draggable element's id)
     src_id = change_card_id(ev.dataTransfer.getData('text'))
@@ -228,16 +252,13 @@ def mydrop(ev):
     rank_id=ev.currentTarget.id # target
     snapoverRank(src_id,rank_id )
     document[rank_id].appendChild(document[src_id])
+    
     # set the new coordinates of the dragged object
     elt.style.left = px(margin) 
     elt.style.top =  px(margin) 
-    # don't drag the object any more
-    #elt.draggable = False
-    # remove the callback function
-    #elt.unbind("mouseover")
+
     elt.style.cursor = "auto"
     ev.preventDefault()
-
         
 def playdrop(ev):
     global m0
@@ -311,23 +332,8 @@ def createCards() :
         if False:
             play <= cc.create(lhmargin,lhmargin +30*i)
         else:
-            play <= cc.create(lhmargin,topmargin+(height+gap)*2 +30*i)
+            play <= cc.create(lhmargin,topmargin+(height+gap)*2 +40*i)
         deck[i]["card"]=cc.id
-        
-    
-    
-"""
-    for i in range(cardCount):
-        src_id=deck[i]["card"]
-        rank_id=rankSlots[i].id
-        snapoverRank(src_id,rank_id )
-        document[rank_id].appendChild(document[src_id if src_id[0]!= 'I' else src_id[1:]])
-        elt=document[src_id]
-        elt.style.left = px(margin) 
-        elt.style.top =  px(margin) 
-"""            
-        
-        
         
     
     
@@ -344,13 +350,11 @@ def animateCSS(element, numFrames, timePerFrame, animation, whendone):
     intervalId=None
     def displayNextFrame():
         global frame,time
-#        print(frame,numFrames,time)
         if frame >= numFrames: #             #// First, see if we're done
             timer.clear_interval(intervalId) #// If so, stop calling ourselves
             if whendone:
                 whendone(element) #// Invoke whendone function
             return
-
 
         for cssprop in animation:
             """
@@ -362,10 +366,9 @@ def animateCSS(element, numFrames, timePerFrame, animation, whendone):
             """
             element.style[cssprop] = animation[cssprop](frame, time);
         
-        frame+=1  #               // Increment the frame number
+        frame+=1  #            // Increment the frame number
         time += timePerFrame  #// Increment the elapsed time
         
-
     intervalId = timer.set_interval(displayNextFrame, timePerFrame)
     
     """
@@ -375,7 +378,6 @@ def animateCSS(element, numFrames, timePerFrame, animation, whendone):
 
     // Now loop through all properties defined in the animation object
     """
-
 
 def shuffleCards():
     """
@@ -413,7 +415,6 @@ def shuffleCards():
             "left": lambda frame,time:px(delta_left/frameCount*frame+margin) ,
         },shuffle2);
         
-        
     assignedSlots[oldslot]=oldsrc
     
 def change_card_id(card_id):
@@ -438,7 +439,6 @@ def snapoverRank(card_id,rank_id):
     cardCount=len(deck)
     card_id=change_card_id(card_id)
     remove_from_slot(card_id)
-        
         
     for r in range(cardCount):
         if rankSlots[r].id ==rank_id:
@@ -466,7 +466,5 @@ def snapoverRank(card_id,rank_id):
                     
             break
     assignedSlots[r]=card_id
-    shuffling=False
-    pass
 
 createCards()
