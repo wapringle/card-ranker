@@ -81,8 +81,8 @@ source.bind("dragstart", dragstart)
 
 topmargin=40
 lhmargin=40
-rhmargin=40
-gap=20
+rhmargin=30
+gap=30
 width=230
 height=166
 margin=4
@@ -281,20 +281,19 @@ def createCards() :
     """ 
     Use this as a container for ranking slots. 
     """
-    print(window.innerHeight,window.innerWidth)
     play =html.DIV("",
         id='play',
         Class='play',
         style={"position":"absolute", "left": px(0), "top": px(0 ), "width": px(window.innerWidth-100), "height": px(window.innerHeight-100)},
         )
     play.bind("dragover", dragover)
-    
     play.bind("drop", playdrop)
     document <= play
+
     x = html.DIV("",id="Cool as a penguin's sit-upon",style={"position":"absolute", "left": px(0), "top": px(0), "width": px(1), "height": px(1)},)
     document <= x
+
     cardCount=len(deck)
-    #print(cardCount)
     for i in range(cardCount): #-1,-1,-1):
         r=Rank(i+1)
         col = i % 4
@@ -302,7 +301,6 @@ def createCards() :
         x <= r.create(lhmargin+(width+rhmargin)*(col),topmargin+(height+gap)*row)
         rankSlots.append(r)
         assignedSlots.append(None)
-
 
     for i in range(cardCount):
         deck[i][flipped]=False
