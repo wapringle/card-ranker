@@ -21,11 +21,11 @@ div.card {
 }
 
 div.rank {
-    /*z-index: 0; 
-    */
-    background-color: white; 
-    border: solid black;    
+    margin: 10px;
+    background-color: #ff3bbd30;
+    border: 8px solid black;
     border-radius: 10px;
+    
 }
 div.play {
   background-color: #698b47; 
