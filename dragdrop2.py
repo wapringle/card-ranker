@@ -58,36 +58,19 @@ def drop(ev):
     elt.style.cursor = "auto"
     ev.preventDefault()
 
+
 """
-panel = document["panel"] # yellow zone
-
-source = document["source"] # red zone
-# place it at (10, 10) from panel top left corner
-source.style.top = "{}px".format(10 + panel.abs_top)
-source.style.left = "{}px".format(10 + panel.abs_left)
-# make red zone draggable
-source.draggable = True
-
-dest = document["dest"] # green zone
-# place it at (10, 150) from panel top left corner
-dest.style.top = "{}px".format(10 + panel.abs_top)
-dest.style.left = "{}px".format(150 + panel.abs_left)
-
-dest.bind("drop", drop)
-dest.bind("dragover", dragover)
-source.bind("mouseover", mouseover)
-source.bind("dragstart", dragstart)
-"""
-
 topmargin=40
 lhmargin=40
 rhmargin=30
 gap=30
-width=230
+#width=230
 height=166
 margin=4
-rankWidth=width+3*margin
+rankWidth= 244 #width+3*margin
 rankHeight=height+3*margin
+"""
+
 style1=True
 
 name="name"
@@ -129,6 +112,11 @@ def mymouseover(ev):
     #print(ev.currentTarget.id)
     mouseover(ev)
     
+def mousedown(ev):
+    id="C"+ev.currentTarget.id[1:]
+    document["play"].appendChild(document[id])
+    
+    
 def mydragstart(ev):
     global sema4,m0
     id=ev.currentTarget.id
@@ -143,6 +131,7 @@ def mydragstart(ev):
         ev.dataTransfer.effectAllowed = "none"
     
 def setZindex(ev,z):
+    return
     document[ev.currentTarget.id].parent.style.zIndex= z
 
 def flipper(ev):
@@ -152,6 +141,7 @@ def flipper(ev):
         id=ev.currentTarget.id
     card=document[id]
     frameCount=20
+    width=card.width
     delta_width=width / frameCount
     ll=card.offsetLeft
     txt=card.firstChild.innerText;
@@ -202,10 +192,6 @@ class Card():
                 id=f'C{self.cardno}',
                 Class="card",
                 style={"position":"absolute", "left": px(left), "top": px(top), 
-                       "width": px(width), 
-                       "height": px(height),  
-                       "border-radius": px(10), 
-                       "background-color": "lightblue",
                 })
         else:
             card=html.DIV(
@@ -221,7 +207,7 @@ class Card():
             card.bind("mouseover", mouseover)
             card.bind("dblclick",flipper)
 
-#        card.style.zIndex=1
+        #card.style.zIndex=0
 
         card.draggable = True
         card.bind("dragstart", mydragstart)
@@ -231,14 +217,19 @@ class Card():
             style={ 'height': px(20), 'background-color':'gray', 'border-bottom': 'dotted black', 'padding': '3px', 'font-family': 'sans-serif', 'font-weight': 'bold',  "border-radius": "inherit", "margin": px(4),}
         )
         header.bind("mouseover", mymouseover)
-        header.bind("mousedown", lambda ev: setZindex(ev,2))
-        header.bind("mouseup", lambda ev: setZindex(ev,1))
+        #header.bind("mousedown", mousedown)
+        
+        #header.bind("mousedown", lambda ev: setZindex(ev,1))
+        #header.bind("mouseup", lambda ev: setZindex(ev,0))
         card <= header
         
         if style1:
-            body_height=height - 20; # a guess
+            body_height=card.offsetHeight - 20; # a guess
             img=get_body_text(self.content)
-            body = html.DIV(html.IMG(src=img, id="I"+self.id, style={"border-radius": "inherit"}), style={'margin': px(4),   "height": px(height-40), "border-radius": "inherit"},id="B"+self.id)
+            body = html.DIV(html.IMG(src=img, id="I"+self.id, style={"border-radius": "inherit"}), 
+                Class="card-body",
+            #style={'margin': px(4),   "height": px(card.offsetHeight-40), "border-radius": "inherit"},
+            id="B"+self.id)
             body.bind("mouseover", mouseover)
             body.bind("dblclick",flipper)
             card <= body
@@ -254,6 +245,7 @@ def mydrop(ev):
     document[rank_id].appendChild(document[src_id])
     
     # set the new coordinates of the dragged object
+    margin=0
     elt.style.left = px(margin) 
     elt.style.top =  px(margin) 
 
@@ -273,7 +265,7 @@ def playdrop(ev):
     elt.style.top = px(ev.y-target.top+elt.parent.top-m0[1])
 
     document["play"].appendChild(document[change_card_id(src_id)])
-    
+    setZindex(ev,0)
     elt.style.cursor = "auto"
     ev.preventDefault()
 
@@ -287,7 +279,7 @@ class Rank():
         rank=html.DIV(html.DIV(str(self.rankno),style={'font-size': 'xx-large', 'text-align': 'left', 'margin': px(20)}),
             id=f'R{self.rankno}',
             Class='rank',
-            style={"position":"absolute", "left": px(left), "top": px(top), "width": px(rankWidth), "height": px(rankHeight)},
+            style={"position":"absolute", "left": px(left), "top": px(top)},
             )
         
         rank.bind("drop", mydrop)
@@ -311,30 +303,41 @@ def createCards() :
     play.bind("drop", playdrop)
     document <= play
 
-    x = html.DIV("",id="Cool as a penguin's sit-upon",style={"position":"absolute", "left": px(0), "top": px(0), "width": px(1), "height": px(1)},)
+    x = html.DIV("",
+        id="Cool as a penguin's sit-upon",
+        Class='rank-holder'
+        #style={"position":"absolute", "left": px(0), "top": px(0), "width": px(1), "height": px(1)},
+        )
     document <= x
-
+    
+    lhmargin=1
     cardCount=len(deck)
+    for i in range(cardCount):
+        deck[i][flipped]=False
+        cc=Card(i)   
+        play <= cc.create(0,0)
+        deck[i]["card"]=cc.id
+    
+    #use cardsize to calculate spacings for rank    
+    c=document[cc.id]
+    hsep=c.offsetWidth+x.width
+    vsep=c.offsetHeight+ x.height
+
     for i in range(cardCount): #-1,-1,-1):
         r=Rank(i+1)
         col = i % 4
         row = (i - col)/4
-        x <= r.create(lhmargin+(width+rhmargin)*(col),topmargin+(height+gap)*row)
+        x <= r.create(x.left+(hsep)*(col),x.top+(vsep)*row)
         rankSlots.append(r)
         assignedSlots.append(None)
 
+    rfirst=document[rankSlots[0].id]
+    rlast=document[rankSlots[-1].id]
     for i in range(cardCount):
-        deck[i][flipped]=False
-        cc=Card(i)   
- 
         col = i % 4
         row = (i - col)/4
-        if False:
-            play <= cc.create(lhmargin,lhmargin +30*i)
-        else:
-            play <= cc.create(lhmargin,topmargin+(height+gap)*2 +40*i)
-        deck[i]["card"]=cc.id
-        
+        document[deck[i]["card"]].top=rlast.offsetTop+rlast.offsetHeight+ 40*i
+        document[deck[i]["card"]].left=rfirst.offsetLeft
     
     
 def animateCSS(element, numFrames, timePerFrame, animation, whendone):
@@ -399,6 +402,7 @@ def shuffleCards():
         frameCount=20
         shuffleFrom=to
         src=document[shuffleSrc]
+        margin=0
         """
         This piece of magic pops the rank to highest priority between slots. This means that
         the shuffled card is always slid from under the origin rank and over the target rank.
