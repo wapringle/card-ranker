@@ -14,11 +14,34 @@ div.clicked {
 
 
 div.card {
-    border: solid white;
+    width: 230px; 
+    height: 166px;
     border-radius: 10px;
+    background-color: lightblue;
+    padding: 2px;
+    margin: 3px;
+    border: 5px solid white;
+}
+div.card-body {
+    width: inherit; 
+    height: 126px;
+    margin: 2px;
+    border-radius: inherit;
+}
+
+
+div.rank-holder {
+    position: absolute;
+    left: 40px; /* LHS of Ranking slots */
+    top: 20px; /* Top of same */
+    width: 20px; /* Horizontal margin of same */
+    height: 20px; /* vertical margin of same */
 }
 
 div.rank {
+    width: 250px; 
+    height: 176px;
+
     margin: 10px;
     background-color: #ff3bbd30;
     border: 8px solid black;

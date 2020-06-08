@@ -11,15 +11,24 @@
     </script> 
     <link rel="stylesheet" href="./include/style.css">
 <style>
-table { border-collapse: collapse; font-family: Calibri, sans-serif; }
-colgroup, tbody { border: solid medium; }
-td { border: solid thin; height: 1.8em; width: 1.8em; text-align: center; padding: 0; }
+
+div.card2 {
+    width: 230px; 
+    height: 166px;
+    border-radius: 10px;
+    background-size: 234px 176px;
+    background-color: lightblue;
+    padding: 2px;
+    margin: 3px;
+    border: 5px solid white;
+}
+
 </style>
 </head>
 
 <body onload="brython()">
 
-<script type="text/python" src="dragdrop.py"> </script>
+<script type="text/python" src="bib2.py"> </script>
 <!--
 <div style="width:400px;height:150px;background-color:yellow" id="panel">
 <div id="dest" style="position:absolute;width:180px;height:80px;background-color:green;color:white;">destination zone</div>
@@ -27,10 +36,9 @@ td { border: solid thin; height: 1.8em; width: 1.8em; text-align: center; paddin
 </div>
 -->
 <script type="text/python">
+import bib2
 
-import dragdrop
-
-dragdrop.DragDrop().createLayout()
+bib2.DragDrop().createLayout()
 
 
 </script>
