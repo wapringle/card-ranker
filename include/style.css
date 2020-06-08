@@ -34,13 +34,13 @@ div.rank-holder {
     position: absolute;
     left: 40px; /* LHS of Ranking slots */
     top: 20px; /* Top of same */
-    width: 30px; /* Horizontal margin of same */
-    height: 30px; /* vertical margin of same */
+    width: 20px; /* Horizontal margin of same */
+    height: 20px; /* vertical margin of same */
 }
 
 div.rank {
     width: 250px; 
-    height: 186px;
+    height: 176px;
 
     margin: 10px;
     background-color: #ff3bbd30;

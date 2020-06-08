@@ -1,4 +1,4 @@
-from browser import document,html,timer,window
+from browser import document,html,timer
 import math
 
 
@@ -7,6 +7,31 @@ import re
 dict(re.findall(r'(\w+): *(\w+);',s))
 dict(re.findall(r'([\w-]+): *([^;]*);',s))
 """
+
+rankSlots=[]
+assignedSlots=[]
+
+class DragDrop():
+    def  get_body_text(self,content):
+        pass
+    def getCard(self,ev):
+        id=change_card_id(ev.currentTarget.id)
+        return document[id]
+
+    def flipper1(self,card):
+        pass
+    def flipper2(self,card):
+        pass
+    def flipper3(self,card):
+        pass
+    def shuffledone(self,freeSlots):
+        pass
+
+interface=DragDrop()
+
+def px(x):
+    return str(x)+"px"
+
 
 # offset of mouse relatively to dragged object when dragging starts
 m0 = [None, None]
@@ -59,63 +84,21 @@ def drop(ev):
     ev.preventDefault()
 
 
-"""
-topmargin=40
-lhmargin=40
-rhmargin=30
-gap=30
-#width=230
-height=166
-margin=4
-rankWidth= 244 #width+3*margin
-rankHeight=height+3*margin
-"""
 
-style1=True
-
-name="name"
-front="front"
-back="back"
-flipped="flipped"
-
-deck=[
-    { name: "Beijing, China", front: "beijing_front.jpg", back: "beijing_back.jpg"},
-    { name: "Bradford, England", front: "bradford_front.jpg", back: "bradford_back.jpg"},
-    { name: "Delhi, India", front: "delhi_front.jpg", back: "delhi_back.jpg"},
-    { name: "Kampala, Uganda", front: "kampala_front.jpg", back: "kampala_back.jpg"},
-    { name: "Lima, Peru", front: "lima_front.jpg", back: "lima_back.jpg"},
-    { name: "London, England", front: "london_front.jpg", back: "london_back.jpg"},
-    { name: "New York, USA", front: "new_york_front.jpg", back: "new_york_back.jpg"},
-    { name: "Paris, France", front: "paris_front.jpg", back: "paris_back.jpg"},
-]
-
-"""
-    { name: "Istanbul, Turkey", front: "istanbul_front.jpg", back: "kampala_back.jpg"},]
-    { name: "Doha, Qatar ", front: "doha_front.jpg", back: "kampala_back.jpg"},
-    { name: "Sydney, Australia", front: "sydney_front.jpg", back: "kampala_back.jpg"},
-    """
 
 sema4=False
 
-def get_deck_for_card(c):
-    for dk in deck:
-        if dk["card"]==c.id:
-            return dk
-    return None; # not found - shouldn't happen haha
-
-
-def px(x):
-    return str(x)+"px"
 
 
 def mymouseover(ev):
-    #print(ev.currentTarget.id)
     mouseover(ev)
     
 def mousedown(ev):
-    id="C"+ev.currentTarget.id[1:]
-    document["play"].appendChild(document[id])
-    
+    #print(ev.currentTarget.id)
+    id=change_card_id(ev.currentTarget.id)
+    if id not in assignedSlots:
+        # its not assigned to a slot
+        document["play"].appendChild(document[id])
     
 def mydragstart(ev):
     global sema4,m0
@@ -135,107 +118,30 @@ def setZindex(ev,z):
     document[ev.currentTarget.id].parent.style.zIndex= z
 
 def flipper(ev):
-    if style1:
-        id=ev.currentTarget.parent.id
-    else:
-        id=ev.currentTarget.id
-    card=document[id]
+    card=interface.getCard(ev)
+    
     frameCount=20
     width=card.width
     delta_width=width / frameCount
     ll=card.offsetLeft
-    txt=card.firstChild.innerText;
-    card.firstChild.innerText="";
-    def flipper3(card):
-        card.firstChild.innerText=txt
-
+    
+    interface.flipper1(card)
     def flipper2(card):
+        
         # This is called to show the reverse side 
-        dk=get_deck_for_card(card)
-        dk[flipped]= not dk[flipped]
-        img=get_body_text(dk)
-        if style1:
-            x="I"+card.id
-            i2=document[x]
-            i2['src']=img
-        else:
-            document[card.id].style["background-image"]= f'url("{img}")'
+        interface.flipper2(card)
         animateCSS(card,frameCount,30,{ 
             "width":  lambda frame,time: px((width * math.cos((frameCount - frame -1 )/frameCount * math.pi / 2))),
             "left":  lambda frame,time: px((ll+width/2 - (width * math.cos((frameCount - frame -1 )/frameCount * math.pi / 2))/2) ),
-        },flipper3)
+        },interface.flipper3)
     
     animateCSS(card,frameCount,30,{ 
         'width':  lambda frame,time: px(width * math.cos((frame+1)/frameCount * math.pi / 2)) ,
         'left':  lambda frame,time: px(ll+width/2 - (width * math.cos((frame+1)/frameCount * math.pi / 2))/2),
-    },flipper2);
+    },flipper2)
 
+  
 
-
-    
-
-def get_body_text(content):
-    side = back if content[flipped] else front
-    jpg=content[side]
-    return 'include/'+jpg
-
-class Card():
-    def __init__(self,cardno):
-        self.cardno=cardno
-        self.content=deck[cardno]
-                            
-    def create(self,left,top):
-        self.id=f'C{self.cardno}'
-        img=get_body_text(self.content)
-        if style1:
-            card=html.DIV(
-                id=f'C{self.cardno}',
-                Class="card",
-                style={"position":"absolute", "left": px(left), "top": px(top), 
-                })
-        else:
-            card=html.DIV(
-                id=f'C{self.cardno}',
-                Class="card",
-                style={"position":"absolute", "left": px(left), "top": px(top), 
-                       "width": px(width), 
-                       "height": px(height),  
-                       "border-radius": px(10), 
-                       "background-image": f'url("{img}")',
-                       "backgroundSize": f"{width}px {height}px",
-                })
-            card.bind("mouseover", mouseover)
-            card.bind("dblclick",flipper)
-
-        #card.style.zIndex=0
-
-        card.draggable = True
-        card.bind("dragstart", mydragstart)
-        
-        header= html.DIV(self.content[name],
-            id=f'H{self.cardno}',
-            style={ 'height': px(20), 'background-color':'gray', 'border-bottom': 'dotted black', 'padding': '3px', 'font-family': 'sans-serif', 'font-weight': 'bold',  "border-radius": "inherit", "margin": px(4),}
-        )
-        header.bind("mouseover", mymouseover)
-        #header.bind("mousedown", mousedown)
-        
-        #header.bind("mousedown", lambda ev: setZindex(ev,1))
-        #header.bind("mouseup", lambda ev: setZindex(ev,0))
-        card <= header
-        
-        if style1:
-            body_height=card.offsetHeight - 20; # a guess
-            img=get_body_text(self.content)
-            body = html.DIV(html.IMG(src=img, id="I"+self.id, style={"border-radius": "inherit"}), 
-                Class="card-body",
-            #style={'margin': px(4),   "height": px(card.offsetHeight-40), "border-radius": "inherit"},
-            id="B"+self.id)
-            body.bind("mouseover", mouseover)
-            body.bind("dblclick",flipper)
-            card <= body
-
-        return card
-   
 def mydrop(ev):
     # retrieve data stored in drag_start (the draggable element's id)
     src_id = change_card_id(ev.dataTransfer.getData('text'))
@@ -268,93 +174,29 @@ def playdrop(ev):
     setZindex(ev,0)
     elt.style.cursor = "auto"
     ev.preventDefault()
-
-        
-class Rank():
-    def __init__(self,rankno):
-        self.rankno=rankno
-                            
-    def create(self,left,top):
-        self.id=f'R{self.rankno}'
-        rank=html.DIV(html.DIV(str(self.rankno),style={'font-size': 'xx-large', 'text-align': 'left', 'margin': px(20)}),
-            id=f'R{self.rankno}',
-            Class='rank',
-            style={"position":"absolute", "left": px(left), "top": px(top)},
-            )
-        
-        rank.bind("drop", mydrop)
-        rank.bind("dragover", dragover)
-        return rank
-        
-rankSlots=[]
-assignedSlots=[]
-
-def createCards() :
-    global deck
-    """ 
-    Use this as a container for ranking slots. 
-    """
-    play =html.DIV("",
-        id='play',
-        Class='play',
-        style={"position":"absolute", "left": px(0), "top": px(0 ), "width": px(window.innerWidth-100), "height": px(window.innerHeight-100)},
-        )
-    play.bind("dragover", dragover)
-    play.bind("drop", playdrop)
-    document <= play
-
-    x = html.DIV("",
-        id="Cool as a penguin's sit-upon",
-        Class='rank-holder'
-        #style={"position":"absolute", "left": px(0), "top": px(0), "width": px(1), "height": px(1)},
-        )
-    document <= x
-    
-    lhmargin=1
-    cardCount=len(deck)
-    for i in range(cardCount):
-        deck[i][flipped]=False
-        cc=Card(i)   
-        play <= cc.create(0,0)
-        deck[i]["card"]=cc.id
-    
-    #use cardsize to calculate spacings for rank    
-    c=document[cc.id]
-    hsep=c.offsetWidth+x.width
-    vsep=c.offsetHeight+ x.height
-
-    for i in range(cardCount): #-1,-1,-1):
-        r=Rank(i+1)
-        col = i % 4
-        row = (i - col)/4
-        x <= r.create(x.left+(hsep)*(col),x.top+(vsep)*row)
-        rankSlots.append(r)
-        assignedSlots.append(None)
-
-    rfirst=document[rankSlots[0].id]
-    rlast=document[rankSlots[-1].id]
-    for i in range(cardCount):
-        col = i % 4
-        row = (i - col)/4
-        document[deck[i]["card"]].top=rlast.offsetTop+rlast.offsetHeight+ 40*i
-        document[deck[i]["card"]].left=rfirst.offsetLeft
-    
-    
-def animateCSS(element, numFrames, timePerFrame, animation, whendone):
+   
+class Ez():
+    pass
+ez=Ez()
+def animateCSS(element, numFrames, timePerFrame, animation, whendone=None):
     """ Adapted from Flanagan's javascript version
     """
-    global frame, time
-    frame = 0 #  // Store current frame number
-    time = 0.0 #   // Store total elapsed time
+    # park these variables inside element - naughty
+    ez.frame = 0 #  // Store current frame number
+    ez.time = 0.0 #   // Store total elapsed time
     """
     // Arrange to call displayNextFrame() every timePerFrame milliseconds.
     // This will display each of the frames of the animation.
     """
-    intervalId=None
+    ez.intervalId=None
     def displayNextFrame():
-        global frame,time
-        if frame >= numFrames: #             #// First, see if we're done
-            timer.clear_interval(intervalId) #// If so, stop calling ourselves
+        if ez.frame >= numFrames: #             #// First, see if we're done
+            timer.clear_interval(ez.intervalId) #// If so, stop calling ourselves
+            """
+            del ez.frame
+            del ez.time
+            del ez.intervalId
+            """
             if whendone:
                 whendone(element) #// Invoke whendone function
             return
@@ -367,12 +209,12 @@ def animateCSS(element, numFrames, timePerFrame, animation, whendone):
                 // of the specified element. Use try/catch to ignore any
                 // exceptions caused by bad return values.
             """
-            element.style[cssprop] = animation[cssprop](frame, time);
+            element.style[cssprop] = animation[cssprop](ez.frame, ez.time);
         
-        frame+=1  #            // Increment the frame number
-        time += timePerFrame  #// Increment the elapsed time
+        ez.frame+=1  #            // Increment the frame number
+        ez.time += timePerFrame  #// Increment the elapsed time
         
-    intervalId = timer.set_interval(displayNextFrame, timePerFrame)
+    ez.intervalId = timer.set_interval(displayNextFrame, timePerFrame)
     
     """
     // The call to animateCSS() returns now, but the previous line ensures that
@@ -391,6 +233,7 @@ def shuffleCards():
     oldslot=shuffleFrom
     oldsrc=shuffleSrc
     if assignedSlots[shuffleFrom]==None:
+        interface.shuffledone(len([p for p in assignedSlots if p==None]))
         sema4=False
     else:
         shuffleSrc=assignedSlots[shuffleFrom]
@@ -422,15 +265,11 @@ def shuffleCards():
     assignedSlots[oldslot]=oldsrc
     
 def change_card_id(card_id):
-    if card_id[0]=='I':
-        # dragging using picture, change id to card
-        return card_id[1:]
-    else:
-        return card_id
+    return "C"+card_id[1:]
         
     
 def remove_from_slot(card_id):
-    cardCount=len(deck)
+    cardCount=len(assignedSlots)
     for i in range(cardCount):
         if assignedSlots[i]==card_id:
             assignedSlots[i]=None
@@ -440,7 +279,7 @@ def snapoverRank(card_id,rank_id):
     global shuffleSrc,shuffleFrom, shuffleDown
     global sema4
     #print(f"snapover {card_id} {rank_id} {assignedSlots} {[i.id for i in rankSlots]}")
-    cardCount=len(deck)
+    cardCount=len(assignedSlots)
     card_id=change_card_id(card_id)
     remove_from_slot(card_id)
         
@@ -471,4 +310,3 @@ def snapoverRank(card_id,rank_id):
             break
     assignedSlots[r]=card_id
 
-createCards()
