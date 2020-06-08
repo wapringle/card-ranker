@@ -20,15 +20,23 @@ td { border: solid thin; height: 1.8em; width: 1.8em; text-align: center; paddin
 <body onload="brython()">
 
 <script type="text/python" src="dragdrop.py"> </script>
-<!--
-<div style="width:400px;height:150px;background-color:yellow" id="panel">
-<div id="dest" style="position:absolute;width:180px;height:80px;background-color:green;color:white;">destination zone</div>
-<div id="source" style="position:absolute;width:80px;height:40px;background-color:red;">draggable object</div>
-</div>
--->
 <script type="text/python">
 
 import dragdrop
+
+dragdrop.deck=[
+    { "name": "Beijing, China", "front": "beijing_front.jpg", "back": "beijing_back.jpg"},
+    { "name": "Bradford, England", "front": "bradford_front.jpg", "back": "bradford_back.jpg"},
+    { "name": "Delhi, India", "front": "delhi_front.jpg", "back": "delhi_back.jpg"},
+    { "name": "Kampala, Uganda", "front": "kampala_front.jpg", "back": "kampala_back.jpg"},
+    { "name": "Lima, Peru", "front": "lima_front.jpg", "back": "lima_back.jpg"},
+    { "name": "London, England", "front": "london_front.jpg", "back": "london_back.jpg"},
+    { "name": "New York, USA", "front": "new_york_front.jpg", "back": "new_york_back.jpg"},
+    { "name": "Paris, France", "front": "paris_front.jpg", "back": "paris_back.jpg"},
+]
+
+
+
 
 dragdrop.DragDrop().createLayout()
 
