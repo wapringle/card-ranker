@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/brython@3.8.9/brython.min.js">
+    </script> 
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/brython@3.8.7/brython_stdlib.js">
+    </script> 
+    <link rel="stylesheet" href="./include/style.css">
+<style>
+
+div.rank-holder {
+    position: absolute;
+    left: 20px; /* LHS of Ranking slots */
+    top: 20px; /* Top of same */
+    width: 20px; /* Horizontal margin of same */
+    height: 30px; /* vertical margin of same */
+}
+
+
+div.rainbow {
+    width: 80px; 
+    height: 120px;
+    border-radius: 10px;
+    padding: 0px;
+    margin: 0px;
+    border: 2px solid white;
+}
+
+div.rank {
+    width: 80px; 
+    height: 120px;
+
+    margin: 10px;
+    background-color: #ff3bbd30;
+    border: 2px solid black;
+    border-radius: 10px;
+    
+}
+
+
+</style>
+</head>
+
+<body onload="brython()">
+<!--
+<script type="text/python" src="rainbow.py"> </script>
+-->
+
+<script type="text/python">
+import rainbow
+
+rainbow.Rainbow().createLayout(7)
+
+
+</script>
+
+</body>
+
+</html>
