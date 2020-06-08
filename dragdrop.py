@@ -11,17 +11,7 @@ front="front"
 back="back"
 flipped="flipped"
 
-deck=[
-    { name: "Beijing, China", front: "beijing_front.jpg", back: "beijing_back.jpg"},
-    { name: "Bradford, England", front: "bradford_front.jpg", back: "bradford_back.jpg"},
-    { name: "Delhi, India", front: "delhi_front.jpg", back: "delhi_back.jpg"},
-    { name: "Kampala, Uganda", front: "kampala_front.jpg", back: "kampala_back.jpg"},
-    { name: "Lima, Peru", front: "lima_front.jpg", back: "lima_back.jpg"},
-    { name: "London, England", front: "london_front.jpg", back: "london_back.jpg"},
-    { name: "New York, USA", front: "new_york_front.jpg", back: "new_york_back.jpg"},
-    { name: "Paris, France", front: "paris_front.jpg", back: "paris_back.jpg"},
-]
-
+deck=[]
 
 
 def px(x):
@@ -61,10 +51,11 @@ class DragDrop(dragdrop2.DragDrop):
         """
         dk=self.get_deck_for_card(card)
         dk["flipped"]= not dk["flipped"]
-        img=self.get_body_text(dk)
-        x="I"+card.id[1:]
-        i2=document[x]
-        i2['src']=img
+        side = "back_image" if dk[flipped] else "front_image"
+        elt=document[card.id] 
+        elt.clear()
+        elt <= dk[side]
+        return
         
     def flipper3(self,card):
         """ Called after flip
@@ -73,9 +64,7 @@ class DragDrop(dragdrop2.DragDrop):
         
     def createCard(self,cardno,content,left,top):
         card_id=f'C{cardno}'
-        content[flipped]=False
         content["card"]=card_id
-        img=self.get_body_text(content)
 
         card=html.DIV(
             id=card_id,
@@ -95,23 +84,42 @@ class DragDrop(dragdrop2.DragDrop):
             id=header_id,
             style={ 'height': px(20), 'background-color':'gray', 'border-bottom': 'dotted black', 'padding': '3px', 'font-family': 'sans-serif', 'font-weight': 'bold',  "border-radius": "inherit", "margin": px(4),}
         )
+        """
         header.bind("mouseover", mymouseover)
         header.bind("mousedown", mousedown)
-
+        
+        
         card <= header
+        """
         
         body_height=card.offsetHeight - 20; # a guess
-        img=self.get_body_text(content)
+
         image_id=f'I{cardno}'
         body_id =f'B{cardno}'
-        body = html.DIV(html.IMG(src=img, id=image_id, style={"border-radius": "inherit"}), 
+
+        content[flipped]=True
+        img=self.get_body_text(content)
+        back_image = header + html.DIV(html.IMG(src=img, id=image_id, style={"border-radius": "inherit"}), 
             Class="card-body",
-        #style={'margin': px(4),   "height": px(card.offsetHeight-40), "border-radius": "inherit"},
-        id=body_id)
+            id=body_id
+        )
+        content["back_image"] = back_image
+        content[flipped]=False
+        img=self.get_body_text(content)
+        front_image = header + html.DIV(html.IMG(src=img, id=image_id, style={"border-radius": "inherit"}), 
+            Class="card-body",
+            id=body_id
+        )
+
+        content["front_image"] = front_image
+        """
+        body <=  content["front_image"]
+
         body.bind("mouseover", mouseover)
         header.bind("mousedown", mousedown)
-        #body.bind("dblclick",flipper)
-        card <= body
+        """
+        
+        card <= front_image
 
         return card
 
