@@ -94,8 +94,8 @@ def mymouseover(ev):
     mouseover(ev)
     
 def mousedown(ev):
-    #print(ev.currentTarget.id)
     id=change_card_id(ev.currentTarget.id)
+    # print(f'{ev.currentTarget.id} {id}')
     if id not in assignedSlots:
         # its not assigned to a slot
         document["play"].appendChild(document[id])
@@ -103,6 +103,7 @@ def mousedown(ev):
 def mydragstart(ev):
     global sema4,m0
     id=ev.currentTarget.id
+    # print('dragstart {id}')
     dragstart(ev)
     # compute mouse offset
     # ev.x and ev.y are the coordinates of the mouse when the event is fired
@@ -119,7 +120,9 @@ def setZindex(ev,z):
 
 def flipper(ev):
     card=interface.getCard(ev)
+    flip(card)
     
+def flip(card):
     frameCount=20
     width=card.width
     delta_width=width / frameCount
@@ -131,13 +134,13 @@ def flipper(ev):
         # This is called to show the reverse side 
         interface.flipper2(card)
         animateCSS(card,frameCount,30,{ 
-            "width":  lambda frame,time: px((width * math.cos((frameCount - frame -1 )/frameCount * math.pi / 2))),
-            "left":  lambda frame,time: px((ll+width/2 - (width * math.cos((frameCount - frame -1 )/frameCount * math.pi / 2))/2) ),
+            "width":  lambda frame,time: px((width * math.cos((frameCount - frame  )/frameCount * math.pi / 2))),
+            "left":  lambda frame,time: px((ll+width/2 - (width * math.cos((frameCount - frame  )/frameCount * math.pi / 2))/2) ),
         },interface.flipper3)
     
     animateCSS(card,frameCount,30,{ 
-        'width':  lambda frame,time: px(width * math.cos((frame+1)/frameCount * math.pi / 2)) ,
-        'left':  lambda frame,time: px(ll+width/2 - (width * math.cos((frame+1)/frameCount * math.pi / 2))/2),
+        'width':  lambda frame,time: px(width * math.cos((frame)/frameCount * math.pi / 2)) ,
+        'left':  lambda frame,time: px(ll+width/2 - (width * math.cos((frame)/frameCount * math.pi / 2))/2),
     },flipper2)
 
   
@@ -162,6 +165,7 @@ def playdrop(ev):
     global m0
     # retrieve data stored in drag_start (the draggable element's id)
     src_id = change_card_id(ev.dataTransfer.getData('text'))
+    #print(f'{ev.dataTransfer.getData("text")} {src_id}')
     elt = document[src_id]
     remove_from_slot(change_card_id(src_id)) # in case card was in a raking slot
     target=ev.currentTarget
@@ -182,20 +186,20 @@ def animateCSS(element, numFrames, timePerFrame, animation, whendone=None):
     """ Adapted from Flanagan's javascript version
     """
     # park these variables inside element - naughty
-    ez.frame = 0 #  // Store current frame number
-    ez.time = 0.0 #   // Store total elapsed time
+    element.frame = 0 #  // Store current frame number
+    element.time = 0.0 #   // Store total elapsed time
     """
     // Arrange to call displayNextFrame() every timePerFrame milliseconds.
     // This will display each of the frames of the animation.
     """
-    ez.intervalId=None
+    element.intervalId=None
     def displayNextFrame():
-        if ez.frame >= numFrames: #             #// First, see if we're done
-            timer.clear_interval(ez.intervalId) #// If so, stop calling ourselves
+        if element.frame >= numFrames: #             #// First, see if we're done
+            timer.clear_interval(element.intervalId) #// If so, stop calling ourselves
             """
-            del ez.frame
-            del ez.time
-            del ez.intervalId
+            del element.frame
+            del element.time
+            del element.intervalId
             """
             if whendone:
                 whendone(element) #// Invoke whendone function
@@ -209,12 +213,12 @@ def animateCSS(element, numFrames, timePerFrame, animation, whendone=None):
                 // of the specified element. Use try/catch to ignore any
                 // exceptions caused by bad return values.
             """
-            element.style[cssprop] = animation[cssprop](ez.frame, ez.time);
+            element.style[cssprop] = animation[cssprop](element.frame, element.time);
         
-        ez.frame+=1  #            // Increment the frame number
-        ez.time += timePerFrame  #// Increment the elapsed time
+        element.frame+=1  #            // Increment the frame number
+        element.time += timePerFrame  #// Increment the elapsed time
         
-    ez.intervalId = timer.set_interval(displayNextFrame, timePerFrame)
+    element.intervalId = timer.set_interval(displayNextFrame, timePerFrame)
     
     """
     // The call to animateCSS() returns now, but the previous line ensures that
@@ -233,7 +237,6 @@ def shuffleCards():
     oldslot=shuffleFrom
     oldsrc=shuffleSrc
     if assignedSlots[shuffleFrom]==None:
-        interface.shuffledone(len([p for p in assignedSlots if p==None]))
         sema4=False
     else:
         shuffleSrc=assignedSlots[shuffleFrom]
@@ -263,6 +266,7 @@ def shuffleCards():
         },shuffle2);
         
     assignedSlots[oldslot]=oldsrc
+    interface.shuffledone(len([p for p in assignedSlots if p==None]))
     
 def change_card_id(card_id):
     return "C"+card_id[1:]
@@ -289,6 +293,7 @@ def snapoverRank(card_id,rank_id):
             if assignedSlots[r]==None:
                 # it's empty, so no shuffling
                 assignedSlots[r]=card_id
+                interface.shuffledone(len([p for p in assignedSlots if p==None]))
                 break
             else:
                 sema4=True
