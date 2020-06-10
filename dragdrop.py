@@ -79,10 +79,9 @@ class DragDrop(dragdrop2.DragDrop):
             Class="card",
             style={"position":"absolute", "left": px(left), "top": px(top), 
             })
-        card.bind("mouseover", mouseover)
+        #card.bind("mouseover", mouseover)
         card.bind("dblclick",flipper)
-
-        #card.style.zIndex=0
+        card.bind("mousedown", mousedown)
 
         card.draggable = True
         card.bind("dragstart", mydragstart)
