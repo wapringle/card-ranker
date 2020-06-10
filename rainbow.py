@@ -1,8 +1,9 @@
 from browser import document,html,timer,window
-from dragdrop2 import dragover, mydragstart, mydrop, mymouseover, playdrop, mouseover, mousedown, flipper
+from dragdrop2 import dragover, mydragstart, mydrop, mymouseover, playdrop, mouseover, mousedown, flipper, flip
 from dragdrop2 import rankSlots, assignedSlots
 import dragdrop
 
+import copy
 
 
 
@@ -21,13 +22,11 @@ rainbow=[
     { name: "violet" },
 ]
 
-
-
-
 def px(x):
     return str(x)+"px"
 
 class Rainbow(dragdrop.DragDrop):
+    shuffled=False
     
     def getDeck(self):
         t="Richard of York gained battles in vain".split(" ")
@@ -42,6 +41,7 @@ class Rainbow(dragdrop.DragDrop):
         if dk["flipped"]:
             elt=document[card.id] 
             elt.clear()
+            dk["back_image"].clear()
             elt <= dk["back_image"]
             
         
@@ -50,9 +50,19 @@ class Rainbow(dragdrop.DragDrop):
         if dk["flipped"]:
             elt=document[card.id] 
             elt.clear()
-            elt <= dk["titled_image"]
+            dk["back_image"] <= dk["back_detail"]
+            elt <= dk["back_image"] 
             
-            elt.firstChild.html=elt.html
+            #elt.firstChild.html=elt.html
+
+    def shuffledone(self,freeSlots):
+        if freeSlots==0:
+            if not self.shuffled:
+                self.shuffled=True
+                for r in rainbow:
+                    card=r["card"]
+                    document[card].bind("dblclick",flipper)
+                    flip(document[card])
 
         
     def createCard(self,cardno,content,left,top):
@@ -66,8 +76,9 @@ class Rainbow(dragdrop.DragDrop):
         ss={"border-radius": "inherit", "width": "inherit", "height": "inherit", "background-color": content["name"], "text-align": "center"}
         content["front_image"]=html.DIV( id=inner_id, style=ss)
         ss["background-color"]="grey"
-        content["titled_image"]=html.DIV(html.SPAN(f'<br>{content["name"]}<br><br>{content["more"]}', Class="sansserif", style={'font-size':'large', "color": content["name"]},id=span_id), id=inner_id, style=ss)
         content["back_image"]=html.DIV( id=inner_id, style=ss)
+        content["back_detail"]=html.SPAN(f'<br>{content["name"]}<br><br>{content["more"]}', Class="sansserif", style={'font-size':'large', "color": content["name"]},id=span_id)
+        
 
         
         card=html.DIV(content["front_image"],
@@ -79,7 +90,7 @@ class Rainbow(dragdrop.DragDrop):
             
         card.bind("mouseover", mouseover)
         card.bind("mousedown", mousedown)
-        card.bind("dblclick",flipper)
+        #card.bind("dblclick",flipper)
 
         card.draggable = True
         card.bind("dragstart", mydragstart)

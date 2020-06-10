@@ -18,8 +18,13 @@ def px(x):
     return str(x)+"px"
 
 class DragDrop(dragdrop2.DragDrop):
+    """ This class contains all elements that should be configurable. 
+    """
     
     def __init__(self):
+        """ The class dragdrop2.DragDrop provides an interface for the modue dragdrop2 which should be 
+            fairly immutible. We instantiate it by overwriting dragdrop2.interface
+        """
         dragdrop2.interface=self
         
     def getDeck(self):
@@ -32,11 +37,8 @@ class DragDrop(dragdrop2.DragDrop):
         return None; # not found - shouldn't happen haha
     
     
-    def get_body_text(self,content):
-        side = back if content[flipped] else front
-        jpg=content[side]
-        return 'include/'+jpg
-    
+    """ dragdrop2.flipper rotates a card. These routines permit different styles of flip
+    """
     def flipper1(self,card):
         """ Called before flip
         """
@@ -63,6 +65,12 @@ class DragDrop(dragdrop2.DragDrop):
         card.firstChild.innerText=card.zz
         
     def createCard(self,cardno,content,left,top):
+        def get_body_text(content):
+            side = back if content[flipped] else front
+            jpg=content[side]
+            return 'include/'+jpg
+        
+        
         card_id=f'C{cardno}'
         content["card"]=card_id
 
@@ -71,10 +79,9 @@ class DragDrop(dragdrop2.DragDrop):
             Class="card",
             style={"position":"absolute", "left": px(left), "top": px(top), 
             })
-        card.bind("mouseover", mouseover)
+        #card.bind("mouseover", mouseover)
         card.bind("dblclick",flipper)
-
-        #card.style.zIndex=0
+        card.bind("mousedown", mousedown)
 
         card.draggable = True
         card.bind("dragstart", mydragstart)
@@ -98,14 +105,14 @@ class DragDrop(dragdrop2.DragDrop):
         body_id =f'B{cardno}'
 
         content[flipped]=True
-        img=self.get_body_text(content)
+        img=get_body_text(content)
         back_image = header + html.DIV(html.IMG(src=img, id=image_id, style={"border-radius": "inherit"}), 
             Class="card-body",
             id=body_id
         )
         content["back_image"] = back_image
         content[flipped]=False
-        img=self.get_body_text(content)
+        img=get_body_text(content)
         front_image = header + html.DIV(html.IMG(src=img, id=image_id, style={"border-radius": "inherit"}), 
             Class="card-body",
             id=body_id
@@ -151,7 +158,6 @@ class DragDrop(dragdrop2.DragDrop):
         x = html.DIV("",
             id="Cool as a penguin's sit-upon",
             Class='rank-holder'
-            #style={"position":"absolute", "left": px(0), "top": px(0), "width": px(1), "height": px(1)},
             )
         document <= x
         
