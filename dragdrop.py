@@ -22,7 +22,7 @@ class DragDrop(dragdrop2.DragDrop):
     """
     
     def __init__(self):
-        """ The class dragdrop2.DragDrop provides an interface for the modue dragdrop2 which should be 
+        """ The class dragdrop2.DragDrop provides an interface for the module dragdrop2 which should be 
             fairly immutible. We instantiate it by overwriting dragdrop2.interface
         """
         dragdrop2.interface=self
@@ -35,6 +35,13 @@ class DragDrop(dragdrop2.DragDrop):
             if dk["card"]==c.id:
                 return dk
         return None; # not found - shouldn't happen haha
+    
+    def  get_body_text(self,content):
+        return content
+    
+    def shuffledone(self,freeSlots):
+        pass
+    
     
     
     """ dragdrop2.flipper rotates a card. These routines permit different styles of flip

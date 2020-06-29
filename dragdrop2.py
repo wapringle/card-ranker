@@ -1,3 +1,5 @@
+from abc import ABC, abstractmethod
+
 from browser import document,html,timer
 import math
 
@@ -11,23 +13,32 @@ dict(re.findall(r'([\w-]+): *([^;]*);',s))
 rankSlots=[]
 assignedSlots=[]
 
-class DragDrop():
+class DragDrop(ABC):
+    @abstractmethod
     def  get_body_text(self,content):
         pass
     def getCard(self,ev):
         id=change_card_id(ev.currentTarget.id)
         return document[id]
 
+    @abstractmethod
     def flipper1(self,card):
         pass
+
+    @abstractmethod
     def flipper2(self,card):
         pass
+
+    @abstractmethod
     def flipper3(self,card):
         pass
+
+    @abstractmethod
     def shuffledone(self,freeSlots):
         pass
 
-interface=DragDrop()
+
+interface: DragDrop = None # this will be instantiated by calling routine
 
 def px(x):
     return str(x)+"px"

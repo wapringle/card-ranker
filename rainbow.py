@@ -28,6 +28,9 @@ def px(x):
 class Rainbow(dragdrop.DragDrop):
     shuffled=False
     
+    def get_body_text(self,content):
+        pass
+    
     def getDeck(self):
         t="Richard of York gained battles in vain".split(" ")
         for i in range(len(rainbow)):
