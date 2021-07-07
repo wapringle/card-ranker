@@ -95,7 +95,7 @@ function drag(elementToDrag, event) {
      /* added WP
       * on mouseup we want to snap onto target or revert to original position if outside target
       */
-        var ret=snapoverRank(elementToDrag,e.clientX,e.clientY);
+        var ret=snapoverRank(elementToDrag); //,e.clientX,e.clientY);
         if(ret.length==0) {
             elementToDrag.style.left = origX + "px";
             elementToDrag.style.top = origY + "px";
