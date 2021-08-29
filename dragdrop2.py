@@ -310,7 +310,7 @@ def remove_from_slot(card_id):
 def snapoverRank(card_id, rank_id):
     global shuffleSrc, shuffleFrom, shuffleDown
     global sema4
-    # print(f"snapover {card_id} {rank_id} {assignedSlots} {[i.id for i in rankSlots]}")
+    print(f"snapover {card_id} {rank_id} {assignedSlots} {[i.id for i in rankSlots]}")
     cardCount = len(assignedSlots)
     card_id = change_card_id(card_id)
     remove_from_slot(card_id)

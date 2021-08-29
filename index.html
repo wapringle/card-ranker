@@ -11,35 +11,31 @@
     </script> 
     <link rel="stylesheet" href="./include/style.css">
 <style>
-table { border-collapse: collapse; font-family: Calibri, sans-serif; }
-colgroup, tbody { border: solid medium; }
-td { border: solid thin; height: 1.8em; width: 1.8em; text-align: center; padding: 0; }
+ul { font-family: Calibri, sans-serif; }
+li {  text-align: left; padding: 0; }
 </style>
 </head>
 
 <body onload="brython()">
 
-<script type="text/python" src="dragdrop.py"> </script>
 <script type="text/python">
 
-import dragdrop
+from browser import document, html
 
-dragdrop.deck=[
-    { "name": "Beijing, China", "front": "beijing_front.jpg", "back": "beijing_back.jpg"},
-    { "name": "Bradford, England", "front": "bradford_front.jpg", "back": "bradford_back.jpg"},
-    { "name": "Delhi, India", "front": "delhi_front.jpg", "back": "delhi_back.jpg"},
-    { "name": "Kampala, Uganda", "front": "kampala_front.jpg", "back": "kampala_back.jpg"},
-    { "name": "Lima, Peru", "front": "lima_front.jpg", "back": "lima_back.jpg"},
-    { "name": "London, England", "front": "london_front.jpg", "back": "london_back.jpg"},
-    { "name": "New York, USA", "front": "new_york_front.jpg", "back": "new_york_back.jpg"},
-    { "name": "Paris, France", "front": "paris_front.jpg", "back": "paris_back.jpg"},
+list=[
+("Air Pollution","air-pollution.html","Rank cities in order of Air Pollution"),
+("Rainbow","rainbow.html","Order colours of the rainbow" ),
+("English Kings & Queens","engmonarchs.html","Place a selection of English monarchs in date order"),
 ]
 
 
+x = html.UL()
+for l in list:
+    x<= html.LI(
+        html.DIV(
+            html.A(l[0], href=l[1], target='_blank')+" "+l[2]))
 
-
-dragdrop.DragDrop().createLayout()
-
+document <= x
 
 </script>
 

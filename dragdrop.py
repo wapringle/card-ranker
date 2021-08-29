@@ -68,6 +68,46 @@ class DragDrop(dragdrop2.DragDrop):
         """ Called after flip
         """
         card.firstChild.innerText = card.zz
+        card.left=0
+    
+    def makeHeader(self,content,cardno):
+        header_id = f'H{cardno}'
+        header = html.DIV(content[name],
+                          id=header_id,
+                          style={'height': px(20), 'background-color': 'gray', 'border-bottom': 'dotted black', 'padding': '3px', 'font-family': 'sans-serif', 'font-weight': 'bold', "border-radius": "inherit", "margin": px(4), }
+                          )
+        return header
+    
+    def makeFrontImage(self,content,cardno):
+        image_id = f'I{cardno}'
+        body_id = f'B{cardno}'
+        img= 'include/' + content['front']
+        return html.DIV(
+            html.IMG(
+                src=img, 
+                id=image_id, 
+                style={"border-radius": "inherit"}
+            ),
+            Class="card-body",
+            id=body_id
+            )
+        
+    def makeBackImage(self,content,cardno):
+        image_id = f'I{cardno}'
+        body_id = f'B{cardno}'
+        img= 'include/' + content['back']
+        return html.DIV(
+            html.IMG(
+                src=img, 
+                id=image_id, 
+                style={"border-radius": "inherit"}
+            ),
+            Class="card-body",
+            id=body_id
+            )
+        pass
+      
+         
 
     def createCard(self, cardno, content, left, top):
         def get_body_text(content):
@@ -89,38 +129,18 @@ class DragDrop(dragdrop2.DragDrop):
 
         card.draggable = True
         card.bind("dragstart", mydragstart)
-
-        header_id = f'H{cardno}'
-        header = html.DIV(content[name],
-                          id=header_id,
-                          style={'height': px(20), 'background-color': 'gray', 'border-bottom': 'dotted black', 'padding': '3px', 'font-family': 'sans-serif', 'font-weight': 'bold', "border-radius": "inherit", "margin": px(4), }
-                          )
-        """
-        header.bind("mouseover", mymouseover)
-        header.bind("mousedown", mousedown)
         
-        
-        card <= header
-        """
+        header=self.makeHeader(content,cardno)
 
         body_height = card.offsetHeight - 20  # a guess
 
-        image_id = f'I{cardno}'
-        body_id = f'B{cardno}'
 
         content[flipped] = True
-        img = get_body_text(content)
-        back_image = header + html.DIV(html.IMG(src=img, id=image_id, style={"border-radius": "inherit"}),
-                                       Class="card-body",
-                                       id=body_id
-                                       )
+        back_image = header + self.makeBackImage(content,cardno)
+        
         content["back_image"] = back_image
         content[flipped] = False
-        img = get_body_text(content)
-        front_image = header + html.DIV(html.IMG(src=img, id=image_id, style={"border-radius": "inherit"}),
-                                        Class="card-body",
-                                        id=body_id
-                                        )
+        front_image = header + self.makeFrontImage(content,cardno)
 
         content["front_image"] = front_image
         """
@@ -145,7 +165,22 @@ class DragDrop(dragdrop2.DragDrop):
         rank.bind("drop", mydrop)
         rank.bind("dragover", dragover)
         return rank
+    def getRankBorder(self,r):
+        return r.width+30,r.height+30
+    
+    def arrangeCards(self,dd,rankSlots):
+        rfirst = document[rankSlots[0].id]
+        rlast = document[rankSlots[-1].id]
+        for i in range(len(rankSlots)):
+            #col = i % columns
+            #row = (i - col) / columns
+            card_id = f'C{i}'
+            document[card_id].top = rlast.offsetTop + rlast.offsetHeight + 40 * i
+            document[card_id].left = rfirst.offsetLeft
 
+
+        
+        
     def createLayout(self, columns=4):
         """ 
         Use this as a container for ranking slots. 
@@ -172,29 +207,24 @@ class DragDrop(dragdrop2.DragDrop):
             card = self.createCard(i, dd[i], 0, 0)
             play <= card
 
-        # use cardsize to calculate spacings for rank
-        c = document[card.id]
-        hsep = c.offsetWidth + x.width
-        vsep = c.offsetHeight + x.height
+       
+        hsep,vsep=0,0
+            
 
         for i in range(cardCount):
             col = i % columns
             row = (i - col) / columns
             r = self.createRank(i + 1, x.left + (hsep) * (col), x.top + (vsep) * row)
             x <= r
+            if i==0:
+                #instantiate these once info is available
+                hsep,vsep=self.getRankBorder(r)
+                print(hsep,vsep)
+                
             rankSlots.append(r)
             assignedSlots.append(None)
-
-        rfirst = document[rankSlots[0].id]
-        rlast = document[rankSlots[-1].id]
-        for i in range(cardCount):
-            col = i % columns
-            row = (i - col) / columns
-            document[dd[i]["card"]].top = rlast.offsetTop + rlast.offsetHeight + 40 * i
-            document[dd[i]["card"]].left = rfirst.offsetLeft
-
-
-
+            
+        self.arrangeCards(dd,rankSlots)
 
 
 
