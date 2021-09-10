@@ -1,13 +1,21 @@
+from dataclasses import dataclass
+
 from browser import document, html, timer, window
 from dragdrop2 import dragover, mydragstart, mydrop, mymouseover, playdrop, mouseover, mousedown, flipper, change_card_id
 from dragdrop2 import rankSlots, assignedSlots
 import dragdrop2
 
+@dataclass
+class Content:
+    name: str
+    front: str
+    back: str
+    flipped:bool=False
+    card: str=''
+    front_image=None
+    back_image=None
+    
 
-name = "name"
-front = "front"
-back = "back"
-flipped = "flipped"
 
 deck = []
 
@@ -19,6 +27,7 @@ def px(x):
 class DragDrop(dragdrop2.DragDrop):
     """ This class contains all elements that should be configurable. 
     """
+    contentDeck=[]
 
     def __init__(self):
         """ The class dragdrop2.DragDrop provides an interface for the module dragdrop2 which should be 
@@ -27,11 +36,12 @@ class DragDrop(dragdrop2.DragDrop):
         dragdrop2.interface = self
 
     def getDeck(self):
-        return deck
+        self.contentDeck= [Content(**p) for p in deck]
+        return self.contentDeck
 
     def get_deck_for_card(self, c):
-        for dk in self.getDeck():
-            if dk["card"] == c.id:
+        for dk in self.contentDeck:
+            if dk.card == c.id:
                 return dk
         return None  # not found - shouldn't happen haha
 
@@ -57,11 +67,10 @@ class DragDrop(dragdrop2.DragDrop):
         """ Called halfway though
         """
         dk = self.get_deck_for_card(card)
-        dk["flipped"] = not dk["flipped"]
-        side = "back_image" if dk[flipped] else "front_image"
+        dk.flipped = not dk.flipped
         elt = document[card.id]
         elt.clear()
-        elt <= dk[side]
+        elt <= dk.back_image if dk.flipped else dk.front_image
         return
 
     def flipper3(self, card):
@@ -69,14 +78,13 @@ class DragDrop(dragdrop2.DragDrop):
         """
         card.firstChild.innerText = card.zz
 
-    def createCard(self, cardno, content, left, top):
-        def get_body_text(content):
-            side = back if content[flipped] else front
-            jpg = content[side]
+    def createCard(self, cardno, content: Content, left, top):
+        def get_body_text(content: Content):
+            jpg = content.back if content.flipped else content.front
             return 'include/' + jpg
 
         card_id = f'C{cardno}'
-        content["card"] = card_id
+        content.card = card_id
 
         card = html.DIV(
             id=card_id,
@@ -91,7 +99,7 @@ class DragDrop(dragdrop2.DragDrop):
         card.bind("dragstart", mydragstart)
 
         header_id = f'H{cardno}'
-        header = html.DIV(content[name],
+        header = html.DIV(content.name,
                           id=header_id,
                           style={'height': px(20), 'background-color': 'gray', 'border-bottom': 'dotted black', 'padding': '3px', 'font-family': 'sans-serif', 'font-weight': 'bold', "border-radius": "inherit", "margin": px(4), }
                           )
@@ -108,21 +116,21 @@ class DragDrop(dragdrop2.DragDrop):
         image_id = f'I{cardno}'
         body_id = f'B{cardno}'
 
-        content[flipped] = True
+        content.flipped = True
         img = get_body_text(content)
         back_image = header + html.DIV(html.IMG(src=img, id=image_id, style={"border-radius": "inherit"}),
                                        Class="card-body",
                                        id=body_id
                                        )
-        content["back_image"] = back_image
-        content[flipped] = False
+        content.back_image = back_image
+        content.flipped = False
         img = get_body_text(content)
         front_image = header + html.DIV(html.IMG(src=img, id=image_id, style={"border-radius": "inherit"}),
                                         Class="card-body",
                                         id=body_id
                                         )
 
-        content["front_image"] = front_image
+        content.front_image = front_image
         """
         body <=  content["front_image"]
 
@@ -190,8 +198,8 @@ class DragDrop(dragdrop2.DragDrop):
         for i in range(cardCount):
             col = i % columns
             row = (i - col) / columns
-            document[dd[i]["card"]].top = rlast.offsetTop + rlast.offsetHeight + 40 * i
-            document[dd[i]["card"]].left = rfirst.offsetLeft
+            document[dd[i].card].top = rlast.offsetTop + rlast.offsetHeight + 40 * i
+            document[dd[i].card].left = rfirst.offsetLeft
 
 
 
