@@ -1,0 +1,65 @@
+
+
+div.selected {
+/*    z-index: 2;
+*/
+    background-color: #e0f7fa; 
+}
+
+
+div.clicked {
+    z-index: 3;
+    background-color: #00bcd4; 
+}
+
+
+div.card {
+    width: 166px; 
+    height: 240px;
+    border-radius: 10px;
+    background-color: lightblue;
+    padding: 2px;
+    margin: 3px;
+    border: 5px solid white;
+}
+div.card-body {
+    width: inherit; 
+    height: 126px;
+    margin: 2px;
+    border-radius: inherit;
+}
+
+
+/* holds the cards */
+
+div.rank-holder {
+    position: absolute;
+    left: 20px; /* LHS of Ranking slots */
+    top: 20px; /* Top of same */
+    width: 20px; /* Horizontal margin of same */
+    height: 20px; /* vertical margin of same */
+}
+
+div.rank {
+    width: 186px; 
+    height: 280px;
+
+    margin: 10px;
+    background-color: #ff3bbd30;
+    border: 8px solid black;
+    border-radius: 10px;
+    
+}
+div.play {
+  background-color: #698b47; 
+
+  border: 20px solid tan;
+  padding: 20px;
+  margin: 10px;
+  border-radius: 10px;
+
+}
+img {
+    width: 100%;
+    height: 100%;
+}

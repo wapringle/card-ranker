@@ -13,6 +13,10 @@ dict(re.findall(r'([\w-]+): *([^;]*);',s))
 rankSlots = []
 assignedSlots = []
 
+def px(x):
+    return str(x) + "px"
+
+
 
 class DragDrop(ABC):
     @abstractmethod

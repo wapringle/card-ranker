@@ -1,8 +1,7 @@
 import time,copy,sys
 from dataclasses import dataclass
 from browser import document, html, timer, window
-sys.path.append("engmonarchs")
-import monarchdata
+
 import  dragdrop 
 from dragdrop import px
 from dragdrop2 import dragover, mydragstart, mydrop, mymouseover, playdrop, mouseover, mousedown, flipper, change_card_id, flip
@@ -12,10 +11,10 @@ import random
 
 
 @dataclass
-class MonContent(dragdrop.Content):
+class PresContent(dragdrop.Content):
     Dates: str
     Height: str
-    Monarch: str
+    President: str
     Title: str 
     Width: str
     WikiURL: str
@@ -71,16 +70,16 @@ def arrangeAll(ev):
 class DragDrop(dragdrop.DragDrop):
 
     def getDeck(self,deck):
-        self.contentDeck= [MonContent(**p) for p in deck]
+        self.contentDeck= [PresContent(**p) for p in deck]
 
     def makeHeader(self,content,cardno):
         header_id = f'H{cardno}'
         
         
-        fs= "small" if len(content.Title)>11 else "large"
+        fs= "small" if len(content.President)>11 else "large"
         header = html.DIV(
             html.SPAN(
-                content.Title,id=f'Q{cardno}'
+                content.President,id=f'Q{cardno}'
                 ),
                           id=header_id,
                           style={'text-align': 'center', 'font-size': fs, 'height': px(30), 'background-color': 'gray', 'border-bottom': 'dotted black', 'padding': '3px', 'font-family': 'sans-serif', 'font-weight': 'bold', "border-radius": "inherit", "margin": px(4), }
@@ -108,7 +107,7 @@ class DragDrop(dragdrop.DragDrop):
         return html.DIV(
             #html.DIV(content['Monarch'])+
             html.DIV(html.SPAN(content.Dates),Class="date")+
-            html.DIV(html.P(content.text))+
+            html.DIV(html.P(content.Title))+
             html.A("X",href="https://en.wikipedia.org/"+content.WikiURL,target='_blank'),
             Class="card-text",
             #style={'font_size': 'small', "text-align": 'center'},
@@ -226,3 +225,39 @@ class DragDrop(dragdrop.DragDrop):
         document <= arrange
         
          
+"""
+dragdrop.deck=[presidentdata.presidentdata[p] for p in engmonarchs.order]
+
+class DragDrop(engmonarchs.DragDrop):
+
+    def makeHeader(self,content,cardno):
+        header_id = f'H{cardno}'
+        fs= "small" 
+        header = html.DIV(
+            html.SPAN(
+                content['President'],id=f'Q{cardno}'
+                ),
+                    id=header_id,
+                    style={'text-align': 'center', 'font-size': fs, 'height': engmonarchs.px(30), 'background-color': 'gray', 'border-bottom': 'dotted black', 'padding': '3px', 'font-family': 'sans-serif', 'font-weight': 'bold', "border-radius": "inherit", "margin": '4px', }
+                    )
+        return header
+
+
+    def makeBackImage(self,content,cardno):
+        image_id = f'I{cardno}'
+        body_id = f'B{cardno}'
+        img = content['img url']
+        dd=re.search(r'(\d{4}).*(\d{4})$',content['Dates'])
+        return html.DIV(
+            #html.DIV(content['Monarch'])+
+            html.DIV(html.SPAN(f'{dd.group(1)} - {dd.group(2)}'),Class="date")+
+            html.DIV(html.P(content['Title']))+
+            html.A("X",href="https://en.wikipedia.org/"+content['WikiURL'],target='_blank'),
+            Class="card-text",
+            #style={'font_size': 'small', "text-align": 'center'},
+            id=body_id,
+            text_align='center'
+            )
+
+DragDrop().createLayout(4)
+"""

@@ -92,23 +92,27 @@ span.button-text {
 -->
 
 <script type="text/python">
-import sys,random
-sys.path.append("engmonarchs")
-import monarchdata
+import sys,random,re
+import presidentdata
 import dragdrop
 
+from browser import document, html
+import presidents
 
-import engmonarchs
+
+import presidents
 
 
-arrangement=list(range(len(monarchdata.monarchdata)))
+arrangement=list(range(len(presidentdata.presidentdata)))
 random.shuffle(arrangement)
-engmonarchs.order=arrangement[:12]
+order=arrangement[:12]
 #order=[4,1,3,2]
-deck=[monarchdata.monarchdata[p] for p in engmonarchs.order]
+deck=[presidentdata.presidentdata[p] for p in order]
 
 
-engmonarchs.DragDrop(deck).createLayout(4)
+presidents.DragDrop(deck).createLayout(4)
+
+
 </script>
 
 </body>
