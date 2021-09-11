@@ -39,8 +39,7 @@ def test_president():
     
     
     import presidents
-    
-    
+        
     arrangement=list(range(len(presidentdata.presidentdata)))
     random.shuffle(arrangement)
     order=arrangement[:12]
