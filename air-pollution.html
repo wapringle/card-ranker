@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/brython@3.9/brython.min.js">
+    </script> 
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/brython@3.9/brython_stdlib.js">
+    </script> 
+    <link rel="stylesheet" href="./include/style.css">
+<style>
+table { border-collapse: collapse; font-family: Calibri, sans-serif; }
+colgroup, tbody { border: solid medium; }
+td { border: solid thin; height: 1.8em; width: 1.8em; text-align: center; padding: 0; }
+</style>
+</head>
+
+<body onload="brython()">
+<!--
+<script type="text/python" src="dragdrop.py"> </script>
+-->
+<script type="text/python">
+
+import airpollution
+
+deck=[
+    { "name": "Beijing, China", "front": "beijing_front.jpg", "back": "beijing_back.jpg"},
+    { "name": "Bradford, England", "front": "bradford_front.jpg", "back": "bradford_back.jpg"},
+    { "name": "Delhi, India", "front": "delhi_front.jpg", "back": "delhi_back.jpg"},
+    { "name": "Kampala, Uganda", "front": "kampala_front.jpg", "back": "kampala_back.jpg"},
+    { "name": "Lima, Peru", "front": "lima_front.jpg", "back": "lima_back.jpg"},
+    { "name": "London, England", "front": "london_front.jpg", "back": "london_back.jpg"},
+    { "name": "New York, USA", "front": "new_york_front.jpg", "back": "new_york_back.jpg"},
+    { "name": "Paris, France", "front": "paris_front.jpg", "back": "paris_back.jpg"},
+]
+
+
+
+
+airpollution.DragDrop(deck).createLayout()
+
+
+</script>
+
+</body>
+
+</html>
