@@ -69,7 +69,10 @@ class DragDrop(dragdrop2.DragDrop):
         dk.flipped = not dk.flipped
         elt = document[card.id]
         elt.clear()
-        elt <= dk.back_image if dk.flipped else dk.front_image
+        if dk.flipped :
+            elt <= dk.back_image 
+        else:
+            elt <= dk.front_image
         return
 
     def flipper3(self, card):
