@@ -68,9 +68,9 @@ def dragstart(ev):
     # ev.x and ev.y are the coordinates of the mouse when the event is fired
     # ev.target is the dragged element. Its attributes "left" and "top" are
     # integers, the distance from the left and top borders of the document
-    m0 = [ev.x - ev.target.left, ev.y - ev.target.top]
+    m0 = [ev.x - document[ev.currentTarget.id].left, ev.y - document[ev.currentTarget.id].top]
     # associate data to the dragging process
-    ev.dataTransfer.setData("text", ev.target.id)
+    ev.dataTransfer.setData("text", ev.currentTarget.id)
     # allow dragged object to be moved
     ev.dataTransfer.effectAllowed = "move"
 
@@ -121,7 +121,7 @@ def mousedown(ev):
 def mydragstart(ev):
     global sema4, m0
     id = ev.currentTarget.id
-    # print('dragstart {id}')
+    #print(f'dragstart {id} {ev.currentTarget.left} {document[id].left}' )
     dragstart(ev)
     # compute mouse offset
     # ev.x and ev.y are the coordinates of the mouse when the event is fired
@@ -314,7 +314,7 @@ def remove_from_slot(card_id):
 def snapoverRank(card_id, rank_id):
     global shuffleSrc, shuffleFrom, shuffleDown
     global sema4
-    print(f"snapover {card_id} {rank_id} {assignedSlots} {[i.id for i in rankSlots]}")
+    #print(f"snapover {card_id} {rank_id} {assignedSlots} {[i.id for i in rankSlots]}")
     cardCount = len(assignedSlots)
     card_id = change_card_id(card_id)
     remove_from_slot(card_id)
