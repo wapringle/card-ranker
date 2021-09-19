@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from browser import document, html, window
 from dragdrop2 import dragover, drop, mydrop, mydragstart, playdrop, mousedown, flipper, change_card_id
-from dragdrop2 import px, rankSlots, assignedSlots
+from dragdrop2 import px, rankSlots, assignedSlots,snapoverRank,flip
 import dragdrop2
 
 @dataclass
@@ -20,6 +20,62 @@ class Content:
 
 #deck = []
 #contentDeck=[]
+
+
+contentDeck=[]
+
+def revealAll(ev):
+    print("reveal all")
+    
+    for r in contentDeck:
+        
+        if r.card in assignedSlots and r.flipped==False:
+            flip(document[r.card])
+
+
+actionList=[]
+shuffleDoneAction=None
+
+def postArrange():
+    global actionList, shuffleDoneAction
+    if len(actionList):
+        card_id, rank_id=actionList.pop()
+        snapoverRank(card_id, rank_id)
+        document[rank_id].appendChild(document[card_id])
+        #shuffleDoneAction=postArrange
+    else:
+        shuffleDoneAction=None
+        
+        
+    
+def arrangeAll(ev):
+    global shuffleDoneAction
+    print(assignedSlots)
+    print(order)
+    
+    map={}
+    for i,s in enumerate(order):
+        map[s]=i
+    
+    shuffleDoneAction=postArrange
+    for i,k in enumerate(sorted(map.keys())):
+        
+        card_id=f'C{map[k]}'
+        rank_id=f'R{i+1}'
+        actionList.append((card_id,rank_id))
+        
+    postArrange()
+    
+def updateTogo():
+    print(assignedSlots)
+    print(order)
+    endOrder=[ f'C{i}' for (x,i) in sorted((x,i) for i,x in enumerate(order))]
+    togo=len(list(filter(lambda x: endOrder[x[0]]!=x[1],enumerate(assignedSlots))))
+    try:
+        document['togo'].text=str(togo)
+    except KeyError:
+        pass
+    
 
 
 
@@ -48,7 +104,13 @@ class DragDrop(dragdrop2.DragDrop):
         return content
 
     def shuffledone(self, freeSlots):
-        pass
+        global shuffleDoneAction
+        print('shuffledone',freeSlots)
+        if freeSlots==0:
+            updateTogo()
+            
+        if freeSlots==0 and shuffleDoneAction:
+            shuffleDoneAction()
 
     """ dragdrop2.flipper rotates a card. These routines permit different styles of flip
     """
@@ -81,7 +143,29 @@ class DragDrop(dragdrop2.DragDrop):
         card.firstChild.innerText = card.zz
 
       
-         
+    def arrangeCards(self,dd,rankSlots):
+        """
+        rfirst = document[rankSlots[0].id]
+        rlast = document[rankSlots[-1].id]
+        for i in range(len(rankSlots)):
+            #col = i % columns
+            #row = (i - col) / columns40 * i
+            card_id = f'C{i}'
+            document[card_id].top = rfirst.offsetTop 
+            document[card_id].left = rlast.offsetLeft + rlast.width + 40
+        """
+        #super().arrangeCards(dd,rankSlots)
+        for i in range(len(rankSlots)):
+            card_id=f'C{i}'
+            rank_id=f'R{i+1}'
+            snapoverRank(card_id,rank_id)
+            document[rank_id].appendChild(document[card_id])
+            document[card_id].top=0
+            
+            document[card_id].left=0
+
+    
+     
     def createCard(self, cardno, content: Content, left, top):
         def get_body_text(content: Content):
             jpg = content.back if content.flipped else content.front
@@ -178,6 +262,70 @@ class DragDrop(dragdrop2.DragDrop):
             row = (i - col) / columns
             document[dd[i].card].top = rlast.offsetTop + rlast.offsetHeight + 40 * i
             document[dd[i].card].left = rfirst.offsetLeft
+            
+        play=document['play']
+        
+        controlBox=html.DIV(
+            Class='control-box',
+            style={
+                #"position": "absolute", 
+                "margin-left": px(play.width -120), 
+                #"top": px(50), 
+                "width": px(120), 
+                },
+        
+        )
+        controlBoxTable =html.TABLE(Class='control-box')
+        
+        controlBox <= controlBoxTable
+        
+        reveal = html.TR(
+            html.TD(html.SPAN("Reveal all",Class='control-text'))+
+            html.TD(html.INPUT(type='checkbox',id='reveal'))
+            )
+
+        reveal.bind("click",revealAll)
+        controlBoxTable <= reveal
+        
+        arrange = html.TR(
+            html.TD(html.SPAN("arrange all",Class='control-text'))+
+            html.TD(html.INPUT(type='checkbox',id='arrange'))
+            )
+        arrange.bind("click",arrangeAll)
+        controlBoxTable <= arrange
+        
+        togo = html.TR(
+            html.TD(html.SPAN("togo ",Class='control-text'))+
+            html.TD(html.SPAN("",id='togo'))
+            )
+
+        controlBoxTable <= togo
+        updateTogo()
+
+        play <=controlBox
+        
+        play <= html.DIV(
+            html.DIV(html.SPAN("SHUFFLE"), Class='shuffle')+
+            html.DIV(html.SPAN("SPACE"), Class='shuffle'),
+            Class='shuffle-box',
+            style={
+                #"margin-top": px(500),
+                "margin-left": px(play.width -300), 
+                #"margin-top": px(200),
+                #"width": px(300), 
+                },
+            
+            
+        )        
+        global contentDeck
+        contentDeck = self.contentDeck
+
+        self.arrangeCards(self.contentDeck, rankSlots)
+
+         
+         
+        
+        
 
 
 

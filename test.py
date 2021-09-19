@@ -7,16 +7,17 @@ def test_1():
     
     arrangement=list(range(len(monarchdata.monarchdata)))
     #random.shuffle(arrangement)
-    engmonarchs.order=arrangement[:12]
+    dragdrop.order=arrangement[:12]
     #order=[4,1,3,2]
-    deck=[monarchdata.monarchdata[p] for p in engmonarchs.order]
+    deck=[monarchdata.monarchdata[p] for p in dragdrop.order]
     
     engmonarchs.DragDrop(deck).createLayout(12)
     engmonarchs.revealAll(None)
     engmonarchs.arrangeAll(None)
     
 def test_eng():
-    import airpollution
+    import airpollution,dragdrop
+    dragdrop.order=list(range(8))
     
     deck=[
         { "name": "Beijing, China", "front": "beijing_front.jpg", "back": "beijing_back.jpg"},

@@ -23,8 +23,9 @@ td { border: solid thin; height: 1.8em; width: 1.8em; text-align: center; paddin
 -->
 <script type="text/python">
 
-import airpollution
+import airpollution,dragdrop
 
+dragdrop.order=list(range(8))
 deck=[
     { "name": "Beijing, China", "front": "beijing_front.jpg", "back": "beijing_back.jpg"},
     { "name": "Bradford, England", "front": "bradford_front.jpg", "back": "bradford_back.jpg"},

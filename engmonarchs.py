@@ -4,7 +4,7 @@ from browser import document, html, timer, window
 sys.path.append("engmonarchs")
 import monarchdata
 import  dragdrop 
-from dragdrop import px
+from dragdrop import px,updateTogo,shuffleDoneAction,revealAll,arrangeAll
 from dragdrop2 import dragover, mydragstart, mydrop, mymouseover, playdrop, mouseover, mousedown, flipper, change_card_id, flip
 from dragdrop2 import rankSlots, assignedSlots, snapoverRank
 import random
@@ -23,49 +23,6 @@ class MonContent(dragdrop.Content):
     text: str
 
 
-contentDeck=[]
-
-def revealAll(ev):
-    print("reveal all")
-    
-    for r in contentDeck:
-        
-        if r.card in assignedSlots and r.flipped==False:
-            flip(document[r.card])
-
-
-actionList=[]
-shuffleDoneAction=None
-
-def postArrange():
-    global actionList, shuffleDoneAction
-    if len(actionList):
-        card_id, rank_id=actionList.pop()
-        snapoverRank(card_id, rank_id)
-        document[rank_id].appendChild(document[card_id])
-        #shuffleDoneAction=postArrange
-    else:
-        shuffleDoneAction=None
-        
-        
-    
-def arrangeAll(ev):
-    global shuffleDoneAction
-    print(assignedSlots)
-    print(order)
-    
-    map={}
-    for i,s in enumerate(order):
-        map[s]=i
-    
-    shuffleDoneAction=postArrange
-    for i,k in enumerate(sorted(map.keys())):
-        
-        card_id=f'C{map[k]}'
-        rank_id=f'R{i+1}'
-        actionList.append((card_id,rank_id))
-        
-    postArrange()
 
 
 class DragDrop(dragdrop.DragDrop):
@@ -162,67 +119,3 @@ class DragDrop(dragdrop.DragDrop):
 
         
         
-    def arrangeCards(self,dd,rankSlots):
-        """
-        rfirst = document[rankSlots[0].id]
-        rlast = document[rankSlots[-1].id]
-        for i in range(len(rankSlots)):
-            #col = i % columns
-            #row = (i - col) / columns40 * i
-            card_id = f'C{i}'
-            document[card_id].top = rfirst.offsetTop 
-            document[card_id].left = rlast.offsetLeft + rlast.width + 40
-        """
-        #super().arrangeCards(dd,rankSlots)
-        for i in range(len(rankSlots)):
-            card_id=f'C{i}'
-            rank_id=f'R{i+1}'
-            snapoverRank(card_id,rank_id)
-            document[rank_id].appendChild(document[card_id])
-            document[card_id].top=0
-            
-            document[card_id].left=0
-
-    
-    def shuffledone(self, freeSlots):
-        global shuffleDoneAction
-        print('shuffledone',freeSlots)
-        if freeSlots==0 and shuffleDoneAction:
-            shuffleDoneAction()
-     
-    def createLayout(self, columns=4):
-        super().createLayout(columns)
-        self.arrangeCards(self.contentDeck, rankSlots)
-        play=document['play']
-        
-        reveal = html.BUTTON(html.SPAN("Reveal all",Class='button-text'),
-                        id='reveal',
-                        Class='button2',
-                        style={
-                            "position": "absolute", 
-                            "left": px(play.width -100), 
-                            "top": px(40), 
-                            "width": px(150), 
-                            "height": px(30)},
-                        )
-        global contentDeck
-        contentDeck = self.contentDeck
-        reveal.bind("click",revealAll)
-        #play.bind("", dragover)
-        document <= reveal
-        
-        arrange = html.BUTTON(html.SPAN("arrange all",Class='button-text'),
-                        id='arrange',
-                        Class='button2',
-                        style={
-                            "position": "absolute", 
-                            "left": px(play.width -100), 
-                            "top": px(100), 
-                            "width": px(150), 
-                            "height": px(30)},
-                        )
-        arrange.bind("click",arrangeAll)
-        #play.bind("", dragover)
-        document <= arrange
-        
-         
