@@ -1,8 +1,8 @@
 import time,copy,sys
 from dataclasses import dataclass
 from browser import document, html, timer, window
-sys.path.append("engmonarchs")
-import monarchdata
+#sys.path.append("engmonarchs")
+#import monarchdata
 import  dragdrop 
 from dragdrop import px,updateTogo,shuffleDoneAction,revealAll,arrangeAll
 from dragdrop2 import dragover, mydragstart, mydrop, mymouseover, playdrop, mouseover, mousedown, flipper, change_card_id, flip

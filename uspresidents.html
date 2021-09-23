@@ -105,12 +105,11 @@ import presidents
 
 arrangement=list(range(len(presidentdata.presidentdata)))
 random.shuffle(arrangement)
-presidents.order=arrangement[:12]
-#order=[4,1,3,2]
-deck=[presidentdata.presidentdata[p] for p in presidents.order]
+order=arrangement[:12]
+deck=[presidentdata.presidentdata[p] for p in order]
 
 
-presidents.DragDrop(deck).createLayout(4)
+presidents.DragDrop(deck,order).createLayout(4)
 
 
 </script>

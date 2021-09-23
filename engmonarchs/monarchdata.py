@@ -1,4 +1,8 @@
-monarchdata=[{'Dates': '924 - 939',
+#global monarchdata
+from browser import window
+global mmm
+window.mmm=123
+window.monarchdata=[{'Dates': '924 - 939',
   'Height': 320,
   'Monarch': 'Aethelstan',
   'Title': 'Aethelstan',

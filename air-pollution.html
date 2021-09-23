@@ -9,6 +9,8 @@
     <script type="text/javascript"
         src="https://cdn.jsdelivr.net/npm/brython@3.9/brython_stdlib.js">
     </script> 
+    <link rel="stylesheet" href="./engmonarchs/style.css">
+
     <link rel="stylesheet" href="./include/style.css">
 <style>
 table { border-collapse: collapse; font-family: Calibri, sans-serif; }
@@ -24,23 +26,35 @@ td { border: solid thin; height: 1.8em; width: 1.8em; text-align: center; paddin
 <script type="text/python">
 
 import airpollution,dragdrop
+import random
 
-dragdrop.order=list(range(8))
-deck=[
-    { "name": "Beijing, China", "front": "beijing_front.jpg", "back": "beijing_back.jpg"},
-    { "name": "Bradford, England", "front": "bradford_front.jpg", "back": "bradford_back.jpg"},
-    { "name": "Delhi, India", "front": "delhi_front.jpg", "back": "delhi_back.jpg"},
-    { "name": "Kampala, Uganda", "front": "kampala_front.jpg", "back": "kampala_back.jpg"},
-    { "name": "Lima, Peru", "front": "lima_front.jpg", "back": "lima_back.jpg"},
-    { "name": "London, England", "front": "london_front.jpg", "back": "london_back.jpg"},
-    { "name": "New York, USA", "front": "new_york_front.jpg", "back": "new_york_back.jpg"},
-    { "name": "Paris, France", "front": "paris_front.jpg", "back": "paris_back.jpg"},
-]
+order=list(range(8))
+random.shuffle(order)
+deck=[{'back': 'new_york_back.jpg',
+  'front': 'new_york_front.jpg',
+  'name': 'New York, USA'},
+ {'back': 'bradford_back.jpg',
+  'front': 'bradford_front.jpg',
+  'name': 'Bradford, England'},
+ {'back': 'london_back.jpg',
+  'front': 'london_front.jpg',
+  'name': 'London, England'},
+ {'back': 'paris_back.jpg',
+  'front': 'paris_front.jpg',
+  'name': 'Paris, France'},
+ {'back': 'lima_back.jpg', 'front': 'lima_front.jpg', 'name': 'Lima, Peru'},
+ {'back': 'beijing_back.jpg',
+  'front': 'beijing_front.jpg',
+  'name': 'Beijing, China'},
+ {'back': 'kampala_back.jpg',
+  'front': 'kampala_front.jpg',
+  'name': 'Kampala, Uganda'},
+ {'back': 'delhi_back.jpg', 'front': 'delhi_front.jpg', 'name': 'Delhi, India'}]
 
 
 
 
-airpollution.DragDrop(deck).createLayout()
+airpollution.DragDrop([deck[p] for p in order],order).createLayout()
 
 
 </script>

@@ -18,11 +18,11 @@ class Content:
     
 
 
-#deck = []
-#contentDeck=[]
-
 
 contentDeck=[]
+order=[]
+actionList=[]
+shuffleDoneAction=None
 
 def revealAll(ev):
     print("reveal all")
@@ -33,8 +33,6 @@ def revealAll(ev):
             flip(document[r.card])
 
 
-actionList=[]
-shuffleDoneAction=None
 
 def postArrange():
     global actionList, shuffleDoneAction
@@ -84,12 +82,14 @@ class DragDrop(dragdrop2.DragDrop):
     """ This class contains all elements that should be configurable. 
     """
 
-    def __init__(self,deck):
+    def __init__(self,deck,sortOrder):
         """ The class dragdrop2.DragDrop provides an interface for the module dragdrop2 which should be 
             fairly immutible. We instantiate it by overwriting dragdrop2.interface
         """
+        global order
         dragdrop2.interface = self
         self.getDeck(deck)
+        order=sortOrder
 
     def getDeck(self,deck):
         self.contentDeck= [Content(**p) for p in deck]

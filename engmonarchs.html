@@ -87,28 +87,39 @@ span.button-text {
 </head>
 
 <body onload="brython()">
+<script type="text/python" src="engmonarchs/monarchdata.py" id="data"> </script>
 <!--
-<script type="text/python" src="rainbow.py"> </script>
+
+<script type="text/python" id="test" >
+from browser import window
+print(__name__,"ZZZZZZZZZZZZ")
+
+window.monarchdata=123
+</script>
+
 -->
 
-<script type="text/python">
-import sys,random
-sys.path.append("engmonarchs")
-import monarchdata
-import dragdrop
+<script type="text/python" id="prog" >
+from browser import window
+#global monarchdata
+print(window.mmm)
+print(__name__,window.monarchdata)
 
+import sys,random
 
 import engmonarchs
 
 
-arrangement=list(range(len(monarchdata.monarchdata)))
+arrangement=list(range(len(window.monarchdata)))
+print(arrangement)
 random.shuffle(arrangement)
-dragdrop.order=arrangement[:12]
+order=arrangement[:12]
 #order=[4,1,3,2]
-deck=[monarchdata.monarchdata[p] for p in dragdrop.order]
+deck=[window.monarchdata[p] for p in order]
 
 
-engmonarchs.DragDrop(deck).createLayout(4)
+engmonarchs.DragDrop(deck,order).createLayout(4)
+
 </script>
 
 </body>
