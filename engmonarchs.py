@@ -1,12 +1,8 @@
 import time,copy,sys
 from dataclasses import dataclass
 from browser import document, html, timer, window
-#sys.path.append("engmonarchs")
-#import monarchdata
 import  dragdrop 
-from dragdrop import px,updateTogo,shuffleDoneAction,revealAll,arrangeAll
-from dragdrop2 import dragover, mydragstart, mydrop, mymouseover, playdrop, mouseover, mousedown, flipper, change_card_id, flip
-from dragdrop2 import rankSlots, assignedSlots, snapoverRank
+from dragdrop import px
 import random
 
 
@@ -21,7 +17,6 @@ class MonContent(dragdrop.Content):
     WikiURL: str
     img_url: str
     text: str
-
 
 
 
@@ -52,7 +47,7 @@ class DragDrop(dragdrop.DragDrop):
             html.IMG(
                 src=img, 
                 id=image_id, 
-                style={"border-radius": "inherit"}
+                style={"width":px(self.card_width),"height":px(self.card_height - 30 - 14)}
             ),
             Class="card-body",
             id=body_id
@@ -78,29 +73,27 @@ class DragDrop(dragdrop.DragDrop):
         super().flipper1(card)
 
         dk = self.get_deck_for_card(card)
-        if dk.flipped:
+        if dk.flipped or True:
             txt = card.firstChild.nextSibling.innerHTML
             card.firstChild.nextSibling.innerHTML = ""
-            """ Naughty - parking txt in card structure
-            """
+            # Naughty - parking txt in card structure
             #print(f'flipper1 {txt}')
             card.zz2 = txt   
 
     def flipper2(self, card):
         dk = self.get_deck_for_card(card)
-        if dk.flipped:
+        if dk.flipped or True:
             card.firstChild.nextSibling.innerHTML = card.zz2
         
         super().flipper2(card)
 
-        if dk.flipped:
+        if dk.flipped or True:
             
         
             txt = card.firstChild.nextSibling.innerHTML
             
             card.firstChild.nextSibling.innerHTML = ""
-            """ Naughty - parking txt in card structure
-            """
+            # Naughty - parking txt in card structure
             #print(f'flipper2b {txt}')
             card.zz2 = txt   
 
@@ -110,7 +103,7 @@ class DragDrop(dragdrop.DragDrop):
     def flipper3(self, card):
         super().flipper3(card)
         dk = self.get_deck_for_card(card)
-        if dk.flipped:
+        if dk.flipped or True:
             #print(f'flipper3 {card.zz2}')
             card.firstChild.nextSibling.innerHTML = card.zz2
         

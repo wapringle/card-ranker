@@ -5,16 +5,16 @@ def test_1():
     sys.path.append("engmonarchs")
     import monarchdata
     
-    arrangement=list(range(len(monarchdata.monarchdata)))
+    arrangement=list(range(len(monarchdata.window.monarchdata)))
     #random.shuffle(arrangement)
-    order=arrangement[:12]
-    #order=[4,1,3,2]
-    deck=[monarchdata.monarchdata[p] for p in order]
+    #order=arrangement[:12]
+    order=[4,1,3,2]
+    deck=[monarchdata.window.monarchdata[p] for p in order]
     
     engmonarchs.DragDrop(deck,order).createLayout(12)
-    engmonarchs.revealAll(None)
-    engmonarchs.arrangeAll(None)
-    
+    dragdrop.revealAll(None)
+    dragdrop.arrangeAll(None)
+    dragdrop.assignedSlots=[]
 def test_eng():
     import airpollution
     order=list(range(8))
@@ -33,6 +33,14 @@ def test_eng():
     airpollution.DragDrop(deck,order).createLayout(4)
     i=1
     
+def test_oscar():
+    import maleoscar
+    import dragdrop
+    maleoscar.DragDrop().createLayout(4)
+    dragdrop.assignedSlots=[]
+    
+
+
 def test_president():
     import sys,random
     import presidentdata
@@ -49,8 +57,11 @@ def test_president():
     
     
     presidents.DragDrop(deck,order).createLayout(4)
+    dragdrop.assignedSlots=[]
 
-#test_1()
+test_1()
 #test_eng()
+
+test_oscar()
 test_president()
 i=1

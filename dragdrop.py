@@ -51,14 +51,17 @@ def arrangeAll(ev):
     print(assignedSlots)
     print(order)
     
-    map={}
+    mp=dict((s,i) for i,s in enumerate(order))
+    """
     for i,s in enumerate(order):
         map[s]=i
+    """
     
     shuffleDoneAction=postArrange
-    for i,k in enumerate(sorted(map.keys())):
+    for i,k in enumerate(sorted(mp.keys())):
+    #for i,k in enumerate(mp.keys()):
         
-        card_id=f'C{map[k]}'
+        card_id=f'C{mp[k]}'
         rank_id=f'R{i+1}'
         actionList.append((card_id,rank_id))
         
@@ -88,8 +91,8 @@ class DragDrop(dragdrop2.DragDrop):
         """
         global order
         dragdrop2.interface = self
-        self.getDeck(deck)
         order=sortOrder
+        self.getDeck(deck)
 
     def getDeck(self,deck):
         self.contentDeck= [Content(**p) for p in deck]
@@ -104,7 +107,7 @@ class DragDrop(dragdrop2.DragDrop):
         return content
 
     def shuffledone(self, freeSlots):
-        global shuffleDoneAction
+        global shuffleDoneAction    
         print('shuffledone',freeSlots)
         if freeSlots==0:
             updateTogo()
@@ -177,7 +180,7 @@ class DragDrop(dragdrop2.DragDrop):
         card = html.DIV(
             id=card_id,
             Class="card",
-            style={"position": "absolute", "left": px(left), "top": px(top),
+            style={"position": "absolute", "left": px(left), "top": px(top),"width":px(self.card_width),"height":px(self.card_height)
                    })
         #card.bind("mouseover", mouseover)
         card.bind("dblclick", flipper)
@@ -189,6 +192,8 @@ class DragDrop(dragdrop2.DragDrop):
         header=self.makeHeader(content,cardno)
 
         body_height = card.offsetHeight - 20  # a guess
+        body_width = card.offsetWidth + 0.0
+          
 
         content.flipped= True
         back_image = header + self.makeBackImage(content,cardno)
@@ -204,13 +209,13 @@ class DragDrop(dragdrop2.DragDrop):
 
         return card
 
-    def createRank(self, rankno, left, top):
+    def createRank(self, rankno, left, top,width,height):
         rank_id = f'R{rankno}'
         rank = html.DIV(html.DIV(str(rankno), style={'font-size': 'xx-large', 'text-align': 'left', 'margin': px(20)}),
-                        id=rank_id,
-                        Class='rank',
-                        style={"position": "absolute", "left": px(left), "top": px(top)},
-                        )
+            id=rank_id,
+            Class='rank',
+            style={"position": "absolute", "left": px(left), "top": px(top),"width":px(width),"height":px(height)},
+        )
 
         rank.bind("drop", mydrop)
         rank.bind("dragover", dragover)
@@ -221,23 +226,29 @@ class DragDrop(dragdrop2.DragDrop):
         Use this as a container for ranking slots. 
         """
         play = html.DIV("",
-                        id='play',
-                        Class='play',
-                        style={"position": "absolute", "left": px(0), "top": px(0), "width": px(window.innerWidth - 100), "height": px(window.innerHeight - 100)},
-                        )
+            id='play',
+            Class='play',
+            style={"position": "absolute", "left": px(0), "top": px(0), "width": px(window.innerWidth - 100), "height": px(window.innerHeight - 100)},
+        )
         play.bind("dragover", dragover)
         play.bind("drop", playdrop)
         document <= play
 
         x = html.DIV("",
-                     id="Cool as a penguin's sit-upon",
-                     Class='rank-holder'
-                     )
+            id="Cool as a penguin's sit-upon",
+            Class='rank-holder'
+        )
         document <= x
+        
+        ratio=1.414
+        rank_seperator=40
 
         lhmargin = 1
         dd = self.contentDeck
         cardCount = len(dd)
+        card_rows=cardCount / columns
+        self.card_height= (play.height - (card_rows * rank_seperator)) /card_rows
+        self.card_width= self.card_height / ratio
         for i in range(cardCount):
             card = self.createCard(i, dd[i], 0, 0)
             play <= card
@@ -250,7 +261,7 @@ class DragDrop(dragdrop2.DragDrop):
         for i in range(cardCount):
             col = i % columns
             row = (i - col) / columns
-            r = self.createRank(i + 1, x.left + (hsep) * (col), x.top + (vsep) * row)
+            r = self.createRank(i + 1, x.left + (hsep) * (col), x.top + (vsep) * row, c.offsetWidth, c.offsetHeight)
             x <= r
             rankSlots.append(r)
             assignedSlots.append(None)
@@ -260,7 +271,7 @@ class DragDrop(dragdrop2.DragDrop):
         for i in range(cardCount):
             col = i % columns
             row = (i - col) / columns
-            document[dd[i].card].top = rlast.offsetTop + rlast.offsetHeight + 40 * i
+            document[dd[i].card].top = rlast.offsetTop + rlast.offsetHeight + rank_seperator * i
             document[dd[i].card].left = rfirst.offsetLeft
             
         play=document['play']

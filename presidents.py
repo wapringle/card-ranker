@@ -2,10 +2,8 @@ import time,copy,sys
 from dataclasses import dataclass
 from browser import document, html, timer, window
 
-import  dragdrop 
+import  dragdrop, engmonarchs 
 from dragdrop import px
-from dragdrop2 import dragover, mydragstart, mydrop, mymouseover, playdrop, mouseover, mousedown, flipper, change_card_id, flip
-from dragdrop2 import rankSlots, assignedSlots, snapoverRank
 import random
 
 
@@ -22,7 +20,7 @@ class PresContent(dragdrop.Content):
     text: str
 
 
-class DragDrop(dragdrop.DragDrop):
+class DragDrop(engmonarchs.DragDrop):
 
     def getDeck(self,deck):
         self.contentDeck= [PresContent(**p) for p in deck]
@@ -30,31 +28,17 @@ class DragDrop(dragdrop.DragDrop):
     def makeHeader(self,content,cardno):
         header_id = f'H{cardno}'
         
-        
         fs= "small" if len(content.President)>11 else "large"
         header = html.DIV(
             html.SPAN(
                 content.President,id=f'Q{cardno}'
                 ),
-                          id=header_id,
-                          style={'text-align': 'center', 'font-size': fs, 'height': px(30), 'background-color': 'gray', 'border-bottom': 'dotted black', 'padding': '3px', 'font-family': 'sans-serif', 'font-weight': 'bold', "border-radius": "inherit", "margin": px(4), }
-                          )
+                id=header_id,
+                style={'text-align': 'center', 'font-size': fs, 'height': px(30), 'background-color': 'gray', 'border-bottom': 'dotted black', 'padding': '3px', 'font-family': 'sans-serif', 'font-weight': 'bold', "border-radius": "inherit", "margin": px(4), }
+            )
         return header
     
-    def makeFrontImage(self,content,cardno):
-        image_id = f'I{cardno}'
-        body_id = f'B{cardno}'
-        img = content.img_url
-        return html.DIV(
-            html.IMG(
-                src=img, 
-                id=image_id, 
-                style={"border-radius": "inherit"}
-            ),
-            Class="card-body",
-            id=body_id
-            )
-    
+  
     def makeBackImage(self,content,cardno):
         image_id = f'I{cardno}'
         body_id = f'B{cardno}'
@@ -70,48 +54,4 @@ class DragDrop(dragdrop.DragDrop):
             text_align='center'
             )
         pass
-    
-    def flipper1(self, card):
-        super().flipper1(card)
 
-        dk = self.get_deck_for_card(card)
-        if dk.flipped:
-            txt = card.firstChild.nextSibling.innerHTML
-            card.firstChild.nextSibling.innerHTML = ""
-            """ Naughty - parking txt in card structure
-            """
-            #print(f'flipper1 {txt}')
-            card.zz2 = txt   
-
-    def flipper2(self, card):
-        dk = self.get_deck_for_card(card)
-        if dk.flipped:
-            card.firstChild.nextSibling.innerHTML = card.zz2
-        
-        super().flipper2(card)
-
-        if dk.flipped:
-            
-        
-            txt = card.firstChild.nextSibling.innerHTML
-            
-            card.firstChild.nextSibling.innerHTML = ""
-            """ Naughty - parking txt in card structure
-            """
-            #print(f'flipper2b {txt}')
-            card.zz2 = txt   
-
-        return
-    
-        
-    def flipper3(self, card):
-        super().flipper3(card)
-        dk = self.get_deck_for_card(card)
-        if dk.flipped:
-            #print(f'flipper3 {card.zz2}')
-            card.firstChild.nextSibling.innerHTML = card.zz2
-        
-        # whendone??
-  
-
-        
