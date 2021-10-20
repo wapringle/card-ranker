@@ -18,6 +18,16 @@ li {  text-align: left; padding: 0; }
 
 <body onload="brython()">
 
+<style>
+
+div.text {
+    font-size: Kings;
+    font-family: sans-serif;
+  
+    
+}
+</style>
+
 <script type="text/python">
 
 from browser import document, html
@@ -27,7 +37,8 @@ list=[
 #("Rainbow","rainbow.html","Order colours of the rainbow" ),
 ("English Kings & Queens","engmonarchs.html","Place a selection of English monarchs in date order"),
 ("US Presidents","uspresidents.html","Place a selection of US presidents in date order"),
-("Male Oscar Winners","maleoscar.html","Place a selection of Oscar Winners in date order"),
+("Male Oscar Winners","maleoscar.html","Place a selection of Oscar Winners for best Male Actor in date order"),
+("Female Oscar Winners","femaleoscar.html","Place a selection of Oscar Winners for best female Actor in date order"),
 ]
 
 
@@ -35,7 +46,10 @@ x = html.UL()
 for l in list:
     x<= html.LI(
         html.DIV(
-            html.A(l[0], href=l[1], target='_blank')+" "+l[2]))
+            html.A(l[0], href=l[1], target='_blank')+" "+l[2],
+            Class='text'
+        )
+    )
 
 document <= x
 

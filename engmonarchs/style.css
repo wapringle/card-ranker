@@ -22,10 +22,28 @@ div.card {
     margin: 3px;
     border: 5px solid white;
 }
+
+div.card-header {
+    height: 20px;
+    background-color: gray;
+    border-bottom: dotted black;
+    padding: 3px;
+    border-radius: inherit;
+    margin: 4px;
+    text-align: center;
+
+}
+
+span.card-header-text {
+    font-family: sans-serif;
+    font-weight: bold;
+
+}
+
 div.card-body {
     width: inherit; 
     height: 126px;
-    margin: 2px;
+    margin: 4px;
     border-radius: inherit;
 }
 

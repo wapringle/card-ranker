@@ -60,7 +60,7 @@ def test_president():
     dragdrop.assignedSlots=[]
 
 test_1()
-#test_eng()
+test_eng()
 
 test_oscar()
 test_president()

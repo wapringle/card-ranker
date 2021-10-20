@@ -26,18 +26,8 @@ class DragDrop(dragdrop.DragDrop):
         self.contentDeck= [MonContent(**p) for p in deck]
 
     def makeHeader(self,content,cardno):
-        header_id = f'H{cardno}'
-        
-        
-        fs= "small" if len(content.Title)>11 else "large"
-        header = html.DIV(
-            html.SPAN(
-                content.Title,id=f'Q{cardno}'
-                ),
-                          id=header_id,
-                          style={'text-align': 'center', 'font-size': fs, 'height': px(30), 'background-color': 'gray', 'border-bottom': 'dotted black', 'padding': '3px', 'font-family': 'sans-serif', 'font-weight': 'bold', "border-radius": "inherit", "margin": px(4), }
-                          )
-        return header
+        return self.makeHeaderText(content.Title,cardno)
+
     
     def makeFrontImage(self,content,cardno):
         image_id = f'I{cardno}'
@@ -47,7 +37,7 @@ class DragDrop(dragdrop.DragDrop):
             html.IMG(
                 src=img, 
                 id=image_id, 
-                style={"width":px(self.card_width),"height":px(self.card_height - 30 - 14)}
+                style={"width":px(self.card_width - 10 ),"height":px(self.card_height - 30 - 14)}
             ),
             Class="card-body",
             id=body_id
@@ -71,6 +61,7 @@ class DragDrop(dragdrop.DragDrop):
     
     def flipper1(self, card):
         super().flipper1(card)
+        
 
         dk = self.get_deck_for_card(card)
         if dk.flipped or True:
@@ -106,7 +97,6 @@ class DragDrop(dragdrop.DragDrop):
         if dk.flipped or True:
             #print(f'flipper3 {card.zz2}')
             card.firstChild.nextSibling.innerHTML = card.zz2
-        
         # whendone??
   
 

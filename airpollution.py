@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from browser import document, html#, timer, window
 #from dragdrop2 import dragover, mydragstart, mydrop, mymouseover, playdrop, mouseover, mousedown, flipper, change_card_id
 from dragdrop2 import px
-import dragdrop
+import dragdrop, engmonarchs
 
 
 @dataclass
@@ -14,8 +14,15 @@ class AirContent(dragdrop.Content):
 
 
 
-class DragDrop(dragdrop.DragDrop):
+class DragDrop(engmonarchs.DragDrop):
     """"""
+
+    def __init__(self,deck,sortOrder):
+        super().__init__(deck,sortOrder)
+                      
+        self.ratio=0.9
+        self.rank_seperator=40
+                      
 
     def getDeck(self,deck):
         self.contentDeck= [AirContent(**p) for p in deck]
@@ -23,12 +30,7 @@ class DragDrop(dragdrop.DragDrop):
     
         
     def makeHeader(self,content,cardno):
-        header_id = f'H{cardno}'
-        header = html.DIV(content.name,
-                          id=header_id,
-                          style={'height': px(20), 'background-color': 'gray', 'border-bottom': 'dotted black', 'padding': '3px', 'font-family': 'sans-serif', 'font-weight': 'bold', "border-radius": "inherit", "margin": px(4), }
-                          )
-        return header
+        return self.makeHeaderText(content.name,cardno)    
     
     def makeFrontImage(self,content,cardno):
         image_id = f'I{cardno}'
@@ -38,7 +40,8 @@ class DragDrop(dragdrop.DragDrop):
             html.IMG(
                 src=img, 
                 id=image_id, 
-                style={"border-radius": "inherit"}
+                style={"width":px(self.card_width - 10),"height":px(self.card_height - 30 - 14)}
+                
             ),
             Class="card-body",
             id=body_id
@@ -52,9 +55,10 @@ class DragDrop(dragdrop.DragDrop):
             html.IMG(
                 src=img, 
                 id=image_id, 
-                style={"border-radius": "inherit"}
+                style={"width":px(self.card_width - 10),"height":px(self.card_height - 30 - 14)}
             ),
             Class="card-body",
+            style={"border-radius": px(25)},
             id=body_id
             )
         pass

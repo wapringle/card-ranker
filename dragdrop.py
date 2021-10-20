@@ -52,12 +52,7 @@ def arrangeAll(ev):
     print(order)
     
     mp=dict((s,i) for i,s in enumerate(order))
-    """
-    for i,s in enumerate(order):
-        map[s]=i
-    """
-    
-    shuffleDoneAction=postArrange
+
     for i,k in enumerate(sorted(mp.keys())):
     #for i,k in enumerate(mp.keys()):
         
@@ -65,6 +60,7 @@ def arrangeAll(ev):
         rank_id=f'R{i+1}'
         actionList.append((card_id,rank_id))
         
+    shuffleDoneAction=postArrange
     postArrange()
     
 def updateTogo():
@@ -93,6 +89,10 @@ class DragDrop(dragdrop2.DragDrop):
         dragdrop2.interface = self
         order=sortOrder
         self.getDeck(deck)
+        
+        self.ratio=1.414
+        self.rank_seperator=40
+        
 
     def getDeck(self,deck):
         self.contentDeck= [Content(**p) for p in deck]
@@ -105,6 +105,20 @@ class DragDrop(dragdrop2.DragDrop):
 
     def get_body_text(self, content):
         return content
+    
+    def makeHeaderText(self,text,cardno):
+        header_id = f'H{cardno}'
+       
+        header = html.DIV(
+            html.SPAN(
+                text,
+                id=f'Q{cardno}',
+                Class="card-header-text",
+            ),
+            id=header_id,
+            Class="card-header",
+        )
+        return header        
 
     def shuffledone(self, freeSlots):
         global shuffleDoneAction    
@@ -121,7 +135,7 @@ class DragDrop(dragdrop2.DragDrop):
     def flipper1(self, card):
         """ Called before flip
         """
-        txt = card.firstChild.innerText
+        txt = card.firstChild.innerHTML
         card.firstChild.innerText = ""
         """ Naughty - parking txt in card structure
         """
@@ -143,7 +157,8 @@ class DragDrop(dragdrop2.DragDrop):
     def flipper3(self, card):
         """ Called after flip
         """
-        card.firstChild.innerText = card.zz
+        card.firstChild.innerHTML = card.zz
+        card.style.left=0
 
       
     def arrangeCards(self,dd,rankSlots):
@@ -240,18 +255,28 @@ class DragDrop(dragdrop2.DragDrop):
         )
         document <= x
         
-        ratio=1.414
-        rank_seperator=40
 
         lhmargin = 1
         dd = self.contentDeck
         cardCount = len(dd)
         card_rows=cardCount / columns
-        self.card_height= (play.height - (card_rows * rank_seperator)) /card_rows
-        self.card_width= self.card_height / ratio
+        self.card_height= (play.height - (card_rows * self.rank_seperator)) /card_rows
+        self.card_width= self.card_height / self.ratio
+        if (self.card_width + self.rank_seperator) * columns > play.width * 0.8:
+            self.card_width = ( play.width* 0.8 - (columns * self.rank_seperator)) / columns
+            self.card_height = self.card_width * self.ratio
+            
         for i in range(cardCount):
             card = self.createCard(i, dd[i], 0, 0)
             play <= card
+            
+            htext=document[f'Q{i}']
+            if htext:
+                for s in [20,15,10,5]:
+                    card.fs=s
+                    document[f'H{i}'].style.fontSize=px(s)
+                    if htext.offsetHeight <= 20:
+                        break
 
         # use cardsize to calculate spacings for rank
         c = document[card.id]
@@ -271,7 +296,7 @@ class DragDrop(dragdrop2.DragDrop):
         for i in range(cardCount):
             col = i % columns
             row = (i - col) / columns
-            document[dd[i].card].top = rlast.offsetTop + rlast.offsetHeight + rank_seperator * i
+            document[dd[i].card].top = rlast.offsetTop + rlast.offsetHeight + self.rank_seperator * i
             document[dd[i].card].left = rfirst.offsetLeft
             
         play=document['play']
