@@ -69,7 +69,7 @@ def updateTogo():
     endOrder=[ f'C{i}' for (x,i) in sorted((x,i) for i,x in enumerate(order))]
     togo=len(list(filter(lambda x: endOrder[x[0]]!=x[1],enumerate(assignedSlots))))
     try:
-        document['togo'].text=str(togo)
+        document['togo'].text=f'{togo:02d}'
     except KeyError:
         pass
     
@@ -330,15 +330,30 @@ class DragDrop(dragdrop2.DragDrop):
         arrange.bind("click",arrangeAll)
         controlBoxTable <= arrange
         
-        togo = html.TR(
-            html.TD(html.SPAN("togo ",Class='control-text'))+
-            html.TD(html.SPAN("",id='togo'))
-            )
+        togo = html.DIV(
+            html.SPAN("togo ",Class='control-text')+
+            html.DIV(
+                html.SPAN(
+                    html.SPAN("00",id='togo',Class='foreground')+
+                    html.SPAN("88",id='togo2',Class='background')
+                ),
+                Class="Clock-Wrapper",
+                colspan=2
+        
+            ),
+            style={
+                #"position": "absolute", 
+                "margin-left": px(play.width -120), 
+                #"top": px(50), 
+                "width": px(120), 
+                },
+            
+        )
 
-        controlBoxTable <= togo
         updateTogo()
 
         play <=controlBox
+        play <= togo
         
         play <= html.DIV(
             html.DIV(html.SPAN("SHUFFLE"), Class='shuffle')+
