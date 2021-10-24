@@ -114,5 +114,48 @@ div.shuffle {
     text-shadow: 2px 2px;
     font-family: "Lucida Console", "Courier New", monospace;
     }
+    
+@font-face {
+   font-family: seg7;
+   src: url(../include/7Segment.ttf);
+}
 
+@font-face {
+  font-family: "D7MBI";
+  src: url("../include/DSEG7Modern-BoldItalic.woff") format('woff');
+}
+
+
+span.togo {
+    font-family: "D7MBI";
+    background-color: black;
+    color: red;
+    font-size: x-large;
+}
+
+.Clock-Wrapper {
+    position: relative;
+    border: 6px solid #000;
+    border-radius: 9px;
+    height: 88px;
+    width: 122px;
+    background-color: #fb7c00;
+}
+span.background {
+    font-family: "D7MBI";
+    z-index: 50;
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    color: rgba(0,0,0,0.15);
+    font-size: 70px;
+}
+span.foreground {
+    font-family: "D7MBI";
+    z-index: 100;
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    font-size: 70px;
+}
 .shuffle {}
