@@ -1,22 +1,19 @@
-def test_1():
-    import sys
-    import engmonarchs
-    import dragdrop
-    sys.path.append("engmonarchs")
-    import monarchdata
+import pytest
+import dragdrop
+from dragdrop2 import assignedSlots
+
+@pytest.fixture
+def clean():
+    global assignedSlots
+    assignedSlots=[]
     
-    arrangement=list(range(len(monarchdata.window.monarchdata)))
-    #random.shuffle(arrangement)
-    #order=arrangement[:12]
-    order=[4,1,3,2]
-    deck=[monarchdata.window.monarchdata[p] for p in order]
-    
-    engmonarchs.DragDrop(deck,order).createLayout(12)
-    dragdrop.revealAll(None)
-    dragdrop.arrangeAll(None)
-    dragdrop.assignedSlots=[]
-def test_eng():
+
+def test_eng(clean):
     import airpollution
+
+    global assignedSlots
+    assignedSlots=[]
+
     order=list(range(8))
     
     deck=[
@@ -32,22 +29,40 @@ def test_eng():
     
     airpollution.DragDrop(deck,order).createLayout(4)
     i=1
+
+def test_1(clean):
+    import sys
+    import engmonarchs
+    sys.path.append("engmonarchs")
+    import monarchdata
+
+    global assignedSlots
+    assignedSlots=[]
     
-def test_oscar():
+    arrangement=list(range(len(monarchdata.window.monarchdata)))
+    #random.shuffle(arrangement)
+    #order=arrangement[:12]
+    order=[4,1,3,2]
+    deck=[monarchdata.window.monarchdata[p] for p in order]
+    
+    engmonarchs.DragDrop(deck,order).createLayout(4)
+    dragdrop.revealAll(None)
+    dragdrop.arrangeAll(None)
+    
+def test_oscar(clean):
     import maleoscar
-    import dragdrop
     maleoscar.DragDrop().createLayout(4)
-    dragdrop.assignedSlots=[]
+
     
 
 
-def test_president():
+def test_president(clean):
     import sys,random
     import presidentdata
-    import dragdrop
-    
-    
     import presidents
+
+    global assignedSlots
+    assignedSlots=[]
         
     arrangement=list(range(len(presidentdata.presidentdata)))
     random.shuffle(arrangement)
@@ -57,11 +72,14 @@ def test_president():
     
     
     presidents.DragDrop(deck,order).createLayout(4)
-    dragdrop.assignedSlots=[]
 
+
+"""
 test_1()
 test_eng()
 
 test_oscar()
 test_president()
 i=1
+
+"""

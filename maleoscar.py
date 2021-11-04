@@ -205,7 +205,6 @@ femaleDeck=\
  Oscar(wiki='/wiki/Frances_McDormand', name='Frances McDormand', date='2017', film='Three Billboards Outside Ebbing, Missouri', role=' Mildred Hayes', description='American actress', width=260, height=320, source='https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Frances_McDormand_2015_%28cropped%29.jpg/260px-Frances_McDormand_2015_%28cropped%29.jpg'),
  Oscar(wiki='/wiki/Olivia_Colman', name='Olivia Colman', date='2018', film='The Favourite', role=' Queen Anne', description='English actress', width=214, height=320, source='https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Olivia_Colman_at_Moet_BIFA_2014_%28cropped%29.jpg/214px-Olivia_Colman_at_Moet_BIFA_2014_%28cropped%29.jpg'),
  Oscar(wiki='/wiki/Ren%C3%A9e_Zellweger', name='Renée Zellweger', date='2019', film='Judy', role='Judy Garland', description='American actress (born 1969)', width=236, height=320, source='https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Ren%C3%A9e_Zellweger_Berlinale_2010_%28cropped%29.jpg/236px-Ren%C3%A9e_Zellweger_Berlinale_2010_%28cropped%29.jpg'),
- Oscar(wiki='/wiki/Frances_McDormand', name='Frances McDormand', date='2020/21', film='Nomadland', role='Fern', description='American actress', width=260, height=320, source='https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Frances_McDormand_2015_%28cropped%29.jpg/260px-Frances_McDormand_2015_%28cropped%29.jpg')]
 
 
 
@@ -243,23 +242,20 @@ class DragDrop(engmonarchs.DragDrop):
     def makeBackImage(self,content,cardno):
         image_id = f'I{cardno}'
         body_id = f'B{cardno}'
+        txt_id=f'T{cardno}'
+        date_id=f'D{cardno}'
+
         img = content.source
         text=f'<BR><B>Played</B><BR>{content.role}<BR><B>In</B><BR>{content.film}'
         return html.DIV(
-            html.A(content.description,href="https://en.wikipedia.org/"+content.wiki,target='_blank')+
-            html.SPAN(text)+
-#            html.DIV(html.SPAN(content.description))+
-#            html.DIV(html.SPAN("<BR>Played<BR>", style={"font-weight": "bold"})+html.SPAN(content.role))+
-#            html.DIV(html.SPAN("<BR>In<BR>", style={"font-weight": "bold"})+html.SPAN(content.film))+
-            html.DIV(html.SPAN(content.date),Class="date")
-
-            
-            ,
-            #html.A("X",href="https://en.wikipedia.org/"+content.WikiURL,target='_blank'),
-            Class="card-text",
-            #style={'font_size': 'small', "text-align": 'center'},
+            html.DIV(
+            html.A(content.description,href="https://en.wikipedia.org/"+content.wiki, target='_blank')+
+            html.SPAN(text),
+            id=txt_id,           
+            Class="card-text"            
+            )+
+            html.DIV(html.SPAN(content.date),Class="date",id=date_id),
             id=body_id,
-            text_align='center'
-            )
+        )
         pass
     

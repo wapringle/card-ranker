@@ -46,17 +46,20 @@ class DragDrop(dragdrop.DragDrop):
     def makeBackImage(self,content,cardno):
         image_id = f'I{cardno}'
         body_id = f'B{cardno}'
+        txt_id=f'T{cardno}'
+        date_id=f'D{cardno}'
         img = content.img_url
+
         return html.DIV(
-            #html.DIV(content['Monarch'])+
-            html.DIV(html.SPAN(content.Dates),Class="date")+
-            html.DIV(html.P(content.text))+
-            html.A("X",href="https://en.wikipedia.org/"+content.WikiURL,target='_blank'),
-            Class="card-text",
-            #style={'font_size': 'small', "text-align": 'center'},
-            id=body_id,
-            text_align='center'
-            )
+            html.DIV(
+            html.A(content.text,href="https://en.wikipedia.org/"+content.WikiURL,target='_blank'),
+            id=txt_id,
+            Class="card-text"
+            )+
+            html.DIV(html.SPAN(content.Dates),id=date_id,Class="date"),
+            id=body_id
+        )
+
         pass
     
     def flipper1(self, card):
@@ -97,6 +100,25 @@ class DragDrop(dragdrop.DragDrop):
         if dk.flipped or True:
             #print(f'flipper3 {card.zz2}')
             card.firstChild.nextSibling.innerHTML = card.zz2
+        
+        print(card.id, dk.flipped)
+        if dk.flipped:
+            txt=None
+            try:
+                txt= document['T'+card.id[1:]]
+                date=document['D'+card.id[1:]]
+            except:
+                return
+            print("XX", date.offsetTop)
+            offset=date.offsetTop
+            print("YY")
+            print(card.id, offset, txt.offsetHeight)
+            if txt:
+                for s in range(20,1,-1):
+                    print(f'{txt.id} S {s}')
+                    txt.style.fontSize=px(s)
+                    if txt.offsetHeight <= offset-35:
+                        break            
         # whendone??
   
 

@@ -1,4 +1,4 @@
-import time,copy,sys
+import re
 from dataclasses import dataclass
 from browser import document, html, timer, window
 
@@ -39,15 +39,17 @@ class DragDrop(engmonarchs.DragDrop):
         return header
     
   
-    def makeBackImage(self,content,cardno):
+    def makeBackImage(self,content: PresContent,cardno):
         image_id = f'I{cardno}'
         body_id = f'B{cardno}'
         img = content.img_url
+        dd=re.findall(r'\d\d\d\d',content.Dates)
+        date=' - '.join(dd) if len(dd)==2 else content.Dates
+        
         return html.DIV(
             #html.DIV(content['Monarch'])+
-            html.DIV(html.SPAN(content.Dates),Class="date")+
-            html.DIV(html.P(content.Title))+
-            html.A("X",href="https://en.wikipedia.org/"+content.WikiURL,target='_blank'),
+            html.DIV(html.SPAN(date),Class="date")+
+            html.A(content.Title,href="https://en.wikipedia.org/"+content.WikiURL,target='_blank'),
             Class="card-text",
             #style={'font_size': 'small', "text-align": 'center'},
             id=body_id,

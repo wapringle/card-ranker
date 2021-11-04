@@ -99,10 +99,12 @@ table.control-box {
 .control-text {text-align: right;}
 
 div.shuffle-box {
-    #margin-left: 500px;
-    margin-top: 120px;
+    margin-right: 10px;
     transform: rotate(90deg);
-    width: 300px;
+    transform-origin: 220px 220px;
+    xborder: black; 
+    xborder: dashed;
+    float: right;
 }
 
 div.shuffle {
@@ -114,6 +116,18 @@ div.shuffle {
     text-shadow: 2px 2px;
     font-family: "Lucida Console", "Courier New", monospace;
     }
+    
+div.date {
+    font-weight: bold;
+    font-size: large;
+    font-family: sans-serif;
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    text-align: center;
+    
+
+}
     
 @font-face {
    font-family: seg7;

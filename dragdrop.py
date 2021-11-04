@@ -85,7 +85,7 @@ class DragDrop(dragdrop2.DragDrop):
         """ The class dragdrop2.DragDrop provides an interface for the module dragdrop2 which should be 
             fairly immutible. We instantiate it by overwriting dragdrop2.interface
         """
-        global order
+        global order, assignedSlots
         dragdrop2.interface = self
         order=sortOrder
         self.getDeck(deck)
@@ -301,12 +301,21 @@ class DragDrop(dragdrop2.DragDrop):
             
         play=document['play']
         
+        rhs= html.DIV(id='rhs',
+            style={'position': 'absolute',
+                   'right': px(0),
+                   'width': px(200),
+                   #'border': '3px solid red',
+                   })
+        
+        play <= rhs
         controlBox=html.DIV(
             Class='control-box',
             style={
-                #"position": "absolute", 
-                "margin-left": px(play.width -120), 
-                #"top": px(50), 
+                "xposition": "absolute", 
+                'float': 'right',
+                'right': px(0),
+                "top": px(50), 
                 "width": px(120), 
                 },
         
@@ -342,32 +351,35 @@ class DragDrop(dragdrop2.DragDrop):
         
             ),
             style={
-                #"position": "absolute", 
-                "margin-left": px(play.width -120), 
-                #"top": px(50), 
+                "right": px(0),
                 "width": px(120), 
+                'float': 'right',
+                'margin-right': px(10),
+                
                 },
             
         )
+        
+        i=0
+        
+        print(f'XX {assignedSlots}')
 
         updateTogo()
-
-        play <=controlBox
-        play <= togo
         
-        play <= html.DIV(
+        rhs <=controlBox + togo
+        
+        rhs <= html.DIV(
             html.DIV(html.SPAN("SHUFFLE"), Class='shuffle')+
             html.DIV(html.SPAN("SPACE"), Class='shuffle'),
             Class='shuffle-box',
-            style={
-                #"margin-top": px(500),
-                "margin-left": px(play.width -300), 
-                #"margin-top": px(200),
-                #"width": px(300), 
+            xstyle={
+                "margin-right": px(10), 
+                
                 },
             
             
         )        
+
         global contentDeck
         contentDeck = self.contentDeck
 
