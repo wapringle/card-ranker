@@ -109,6 +109,7 @@ Oscar(wiki='/wiki/Casey_Affleck', name='Casey Affleck', date='2016', film='Manch
 Oscar(wiki='/wiki/Gary_Oldman', name='Gary Oldman', date='2017', film='Darkest Hour', role='Winston Churchill', description='British actor and filmmaker', width=226, height=320, source='https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Gary_Oldman_Cannes_2018.jpg/226px-Gary_Oldman_Cannes_2018.jpg'),
 Oscar(wiki='/wiki/Joaquin_Phoenix', name='Joaquin Phoenix', date='2019', film='Joker', role='Arthur Fleck / Joker', description='American actor and producer', width=256, height=320, source='https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Joaquin_Phoenix_in_2018.jpg/256px-Joaquin_Phoenix_in_2018.jpg'),
 Oscar(wiki='/wiki/Anthony_Hopkins', name='Anthony Hopkins', date='2020/21', film='The Father', role='Anthony', description='Welsh actor', width=252, height=320, source='https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/AnthonyHopkins10TIFF.jpg/252px-AnthonyHopkins10TIFF.jpg')]
+]
 
 
 femaleDeck=\
