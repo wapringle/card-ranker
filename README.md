@@ -8,3 +8,10 @@ Click on a card to rotate the card to show the reverse.
 
 The script drag2.js is a slightly patched version of the one I lifted from David Flanagan's (well thumbed) 
 "Javascipt The Definitive Guide", a must for any javascript hackers. I have also used Flanagan's script animateCSS.js
+
+Expanded to include a number for ranking games, notably
+- English Monarchs
+- Female Oscar Winners
+- Male Oscar Winners
+- Nobel Literature Winners
+  
