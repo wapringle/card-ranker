@@ -67,7 +67,7 @@ def init():
         )
     )
     
-    document <= p3
+    document <= play
 
 
     
