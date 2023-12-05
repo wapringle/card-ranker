@@ -109,7 +109,7 @@ Oscar(wiki='/wiki/Casey_Affleck', name='Casey Affleck', date='2016', film='Manch
 Oscar(wiki='/wiki/Gary_Oldman', name='Gary Oldman', date='2017', film='Darkest Hour', role='Winston Churchill', description='British actor and filmmaker', width=226, height=320, source='https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Gary_Oldman_Cannes_2018.jpg/226px-Gary_Oldman_Cannes_2018.jpg'),
 Oscar(wiki='/wiki/Joaquin_Phoenix', name='Joaquin Phoenix', date='2019', film='Joker', role='Arthur Fleck / Joker', description='American actor and producer', width=256, height=320, source='https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Joaquin_Phoenix_in_2018.jpg/256px-Joaquin_Phoenix_in_2018.jpg'),
 Oscar(wiki='/wiki/Anthony_Hopkins', name='Anthony Hopkins', date='2020/21', film='The Father', role='Anthony', description='Welsh actor', width=252, height=320, source='https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/AnthonyHopkins10TIFF.jpg/252px-AnthonyHopkins10TIFF.jpg')]
-]
+
 
 
 femaleDeck=\
@@ -206,7 +206,7 @@ femaleDeck=\
  Oscar(wiki='/wiki/Frances_McDormand', name='Frances McDormand', date='2017', film='Three Billboards Outside Ebbing, Missouri', role=' Mildred Hayes', description='American actress', width=260, height=320, source='https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/Frances_McDormand_2015_%28cropped%29.jpg/260px-Frances_McDormand_2015_%28cropped%29.jpg'),
  Oscar(wiki='/wiki/Olivia_Colman', name='Olivia Colman', date='2018', film='The Favourite', role=' Queen Anne', description='English actress', width=214, height=320, source='https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Olivia_Colman_at_Moet_BIFA_2014_%28cropped%29.jpg/214px-Olivia_Colman_at_Moet_BIFA_2014_%28cropped%29.jpg'),
  Oscar(wiki='/wiki/Ren%C3%A9e_Zellweger', name='Renée Zellweger', date='2019', film='Judy', role='Judy Garland', description='American actress (born 1969)', width=236, height=320, source='https://upload.wikimedia.org/wikipedia/commons/thumb/4/4b/Ren%C3%A9e_Zellweger_Berlinale_2010_%28cropped%29.jpg/236px-Ren%C3%A9e_Zellweger_Berlinale_2010_%28cropped%29.jpg'),
-
+]
 
 
 class DragDrop(engmonarchs.DragDrop):
